@@ -19,6 +19,7 @@ public class TextMessageDB {
     public static final int ERROR_BODY_NULL = 3;
     public static final int ERROR_ADDRESS_NULL = 4;
     public static final int ERROR_UNKNOWN_ADDRESS_TYPE = 5;
+    public static final int ERROR_MISSING_PART_FILE = 6;
 
     private TextMessageDB() { }
 }

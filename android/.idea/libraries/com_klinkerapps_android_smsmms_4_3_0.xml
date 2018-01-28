@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="com.klinkerapps:android-smsmms-4.3.0">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/android-smsmms-4.3.0.aar/ebd1f81b0b4336d257f96ef822d91d4b/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/android-smsmms-4.3.0.aar/ebd1f81b0b4336d257f96ef822d91d4b/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/android-smsmms-4.3.0.aar/a7e2478f4b13cc0b6a11e591494a69e7/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/android-smsmms-4.3.0.aar/a7e2478f4b13cc0b6a11e591494a69e7/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

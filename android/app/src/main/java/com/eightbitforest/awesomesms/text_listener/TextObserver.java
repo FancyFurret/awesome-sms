@@ -14,8 +14,12 @@ import android.util.Log;
 import com.eightbitforest.awesomesms.AwesomeSMS;
 import com.eightbitforest.awesomesms.model.TextMessage;
 import com.eightbitforest.awesomesms.model.TextMessageDB;
+import com.google.android.mms.ContentType;
 import com.google.android.mms.pdu_alt.PduHeaders;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import static android.provider.Telephony.Mms;
@@ -40,7 +44,6 @@ public class TextObserver extends ContentObserver {
     /**
      * A few constants that for whatever reason are left out of the official library.
      */
-    private static final String MMS_MIME_STRING = "text/plain";
     private static final Uri MMS_PART = Uri.parse("content://mms/part");
     private static final String MMS_ADDRESS = "content://mms/%s/addr";
 
@@ -138,7 +141,7 @@ public class TextObserver extends ContentObserver {
             // We are now good to (try to) parse the message.
             String message;
             ArrayList<TextMessage.Address> addresses = new ArrayList<>();
-            ArrayList<Object> attachments = new ArrayList<>();
+            ArrayList<TextMessage.Attachment> attachments = new ArrayList<>();
             int thread;
             long date;
 
@@ -161,9 +164,10 @@ public class TextObserver extends ContentObserver {
             // ITextListener method.
             TextMessage text = new TextMessage(
                     id,
-                    thread,
-                    addresses,
                     message,
+                    addresses,
+                    attachments,
+                    thread,
                     date,
                     protocol,
                     msgBox);
@@ -387,7 +391,7 @@ public class TextObserver extends ContentObserver {
      * @return The string message.
      * @throws MessageParseException If the part data could not be parsed.
      */
-    private String getMmsPartData(int id, ArrayList<Object> attachments) throws MessageParseException {
+    private String getMmsPartData(int id, ArrayList<TextMessage.Attachment> attachments) throws MessageParseException {
         Cursor partCursor = null;
         try {
             // Get part cursor
@@ -398,16 +402,20 @@ public class TextObserver extends ContentObserver {
             String message = null;
             do {
                 String contentType = getString(partCursor, Mms.Part.CONTENT_TYPE);
-                switch (contentType) {
-                    case MMS_MIME_STRING:
-                        message = getString(partCursor, Mms.Part.TEXT);
-                        if (message == null)
-                            throw new MessageParseException(TextMessageDB.ERROR_BODY_NULL, "MMS Text body was null for id: " + id);
-                        break;
+                if (contentType == null)
+                    continue;
 
-                    default:
-                        Log.w(AwesomeSMS.TAG, "Unknown Mime type: " + contentType + " for id: " + id);
-                }
+                if (contentType.equals(ContentType.TEXT_PLAIN)) {
+                    message = getString(partCursor, Mms.Part.TEXT);
+                    if (message == null)
+                        throw new MessageParseException(TextMessageDB.ERROR_BODY_NULL, "MMS Text body was null for id: " + id);
+                } else if (ContentType.isSupportedImageType(contentType) || // Only send supported media files
+                        ContentType.isSupportedAudioType(contentType) ||
+                        ContentType.isSupportedVideoType(contentType)) {
+                    int partId = getInt(partCursor, Mms.Part._ID);
+                    attachments.add(new TextMessage.Attachment(contentType, getMmsPartPartBytes(partId)));
+                } else
+                    Log.w(AwesomeSMS.TAG, "Unknown Mime type: " + contentType + " for id: " + id);
             } while (partCursor.moveToNext());
 
             return message;
@@ -415,6 +423,34 @@ public class TextObserver extends ContentObserver {
             throw new MessageParseException(TextMessageDB.ERROR_NO_PART, "MMS had no part for id: " + id);
         } finally {
             close(partCursor);
+        }
+    }
+
+    /**
+     * Gets the bytes of data of a stored part.
+     *
+     * @param id The id of the part.
+     * @return Raw byte array of the stored data.
+     * @throws MessageParseException If the data could not be read.
+     */
+    private byte[] getMmsPartPartBytes(int id) throws MessageParseException {
+        InputStream inputStream = null;
+        try {
+            Uri uri = Uri.parse(MMS_PART + "/" + id);
+            inputStream = contentResolver.openInputStream(uri);
+            if (inputStream == null)
+                throw new IOException("Could not open input stream.");
+
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            return bytes;
+        } catch (IOException e) {
+            throw new MessageParseException(TextMessageDB.ERROR_MISSING_PART_FILE, "MMS had no part file for id: " + id);
+        } finally {
+            try {
+                if (inputStream != null)
+                    inputStream.close();
+            } catch (IOException ignored) { }
         }
     }
 
@@ -442,7 +478,7 @@ public class TextObserver extends ContentObserver {
                 int addressType = getInt(addressCursor, Mms.Addr.TYPE);
                 int msgAddressType;
                 switch (addressType) {
-                    // Why do have to download a whole 3rd party library just to use these
+                    // Why do I have to download a whole 3rd party library just to use these
                     // constants...
                     case PduHeaders.TO:
                         msgAddressType = TextMessage.Address.TYPE_TO;

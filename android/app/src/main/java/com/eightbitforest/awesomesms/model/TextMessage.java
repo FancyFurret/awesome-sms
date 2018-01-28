@@ -18,18 +18,20 @@ public class TextMessage {
     public static final int BOX_SENT = 1;
 
     private int id;
-    private int thread;
-    private ArrayList<Address> addresses;
     private String message;
+    private ArrayList<Address> addresses;
+    private ArrayList<Attachment> attachments;
+    private int thread;
     private long date;
     private int protocol;
     private int box;
 
-    public TextMessage(int id, int thread, ArrayList<Address> addresses, String message, long date, int protocol, int box) {
+    public TextMessage(int id, String message, ArrayList<Address> addresses, ArrayList<Attachment> attachments, int thread, long date, int protocol, int box) {
         this.id = id;
-        this.thread = thread;
-        this.addresses = addresses;
         this.message = message;
+        this.addresses = addresses;
+        this.attachments = attachments;
+        this.thread = thread;
         this.date = date;
         this.protocol = protocol;
         this.box = box;
@@ -39,16 +41,20 @@ public class TextMessage {
         return id;
     }
 
-    public int getThread() {
-        return thread;
+    public String getMessage() {
+        return message;
     }
 
     public ArrayList<Address> getAddresses() {
         return addresses;
     }
 
-    public String getMessage() {
-        return message;
+    public ArrayList<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public int getThread() {
+        return thread;
     }
 
     public long getDate() {
@@ -67,9 +73,10 @@ public class TextMessage {
     public String toString() {
         return "TextMessage{" +
                 "id=" + id +
-                ", thread=" + thread +
-                ", addresses=" + addresses +
                 ", message='" + message + '\'' +
+                ", addresses=" + addresses +
+                ", attachments=" + attachments +
+                ", thread=" + thread +
                 ", date=" + date +
                 ", protocol=" + protocol +
                 ", box=" + box +
@@ -103,6 +110,31 @@ public class TextMessage {
             return "Address{" +
                     "address='" + address + '\'' +
                     ", type=" + type +
+                    '}';
+        }
+    }
+
+    public static class Attachment {
+        private String type;
+        private byte[] data;
+
+        public Attachment(String type, byte[] data) {
+            this.type = type;
+            this.data = data;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public byte[] getData() {
+            return data;
+        }
+
+        @Override
+        public String toString() {
+            return "Attachment{" +
+                    "type='" + type + '\'' +
                     '}';
         }
     }
