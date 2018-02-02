@@ -11,11 +11,11 @@ import java.util.ArrayList;
 
 public class TextMessage {
 
-    public static final int PROTOCOL_SMS = 0;
-    public static final int PROTOCOL_MMS = 1;
+    public static final byte PROTOCOL_SMS = 0;
+    public static final byte PROTOCOL_MMS = 1;
 
-    public static final int BOX_INBOX = 0;
-    public static final int BOX_SENT = 1;
+    public static final byte BOX_INBOX = 0;
+    public static final byte BOX_SENT = 1;
 
     private int id;
     private String message;
@@ -23,10 +23,10 @@ public class TextMessage {
     private ArrayList<Attachment> attachments;
     private int thread;
     private long date;
-    private int protocol;
-    private int box;
+    private byte protocol;
+    private byte box;
 
-    public TextMessage(int id, String message, ArrayList<Address> addresses, ArrayList<Attachment> attachments, int thread, long date, int protocol, int box) {
+    public TextMessage(int id, String message, ArrayList<Address> addresses, ArrayList<Attachment> attachments, int thread, long date, byte protocol, byte box) {
         this.id = id;
         this.message = message;
         this.addresses = addresses;
@@ -61,11 +61,11 @@ public class TextMessage {
         return date;
     }
 
-    public int getProtocol() {
+    public byte getProtocol() {
         return protocol;
     }
 
-    public int getBox() {
+    public byte getBox() {
         return box;
     }
 
@@ -85,14 +85,14 @@ public class TextMessage {
 
     public static class Address {
 
-        public static final int TYPE_TO = 0;
-        public static final int TYPE_FROM = 1;
-        public static final int TYPE_CC = 2;
+        public static final byte TYPE_TO = 0;
+        public static final byte TYPE_FROM = 1;
+        public static final byte TYPE_CC = 2;
 
         private String address;
-        private int type;
+        private byte type;
 
-        public Address(String address, int type) {
+        public Address(String address, byte type) {
             this.address = address;
             this.type = type;
         }
@@ -101,7 +101,7 @@ public class TextMessage {
             return address;
         }
 
-        public int getType() {
+        public byte getType() {
             return type;
         }
 

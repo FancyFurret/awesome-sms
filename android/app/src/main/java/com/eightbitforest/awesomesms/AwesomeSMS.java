@@ -6,6 +6,7 @@ package com.eightbitforest.awesomesms;
  * @author Forrest Jones
  */
 
+// TODO: E2EE password change?
 public class AwesomeSMS {
     public static final String TAG = "AwesomeSMS";
 }

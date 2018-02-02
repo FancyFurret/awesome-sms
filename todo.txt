@@ -1,2 +1,0 @@
-* Normalize addresses
-* Normalize dates
