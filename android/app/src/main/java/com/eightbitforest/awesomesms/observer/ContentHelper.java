@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
+import com.eightbitforest.awesomesms.util.DescIntCursorJoiner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,12 +97,6 @@ class ContentHelper {
         return cursor;
     }
 
-    static CursorJoiner getCursorJoiner(Cursor cursorLeft, String columnLeft, Cursor cursorRight, String columnRight) {
-        return new CursorJoiner(
-                cursorLeft, new String[]{columnLeft},
-                cursorRight, new String[]{columnRight});
-    }
-
     /**
      * The OnChange method so helpfully leaves out the very important information of which
      * row changed because that would just be too easy. Instead I have to make a whole database
@@ -110,31 +105,37 @@ class ContentHelper {
      *
      * @param protocol The protocol of the messages to compare.
      */
-    static void joinOnInt(CursorJoiner joiner, Cursor cursorLeft, String columnLeft,
+    static void joinOnInt(Cursor cursorLeft, String columnLeft,
                           Cursor cursorRight, String columnRight,
                           Consumer<Integer> onLeft, Consumer<Integer> onRight) {
+        DescIntCursorJoiner joiner = new DescIntCursorJoiner(
+                cursorLeft, new String[]{columnLeft},
+                cursorRight, new String[]{columnRight});
+
         ArrayList<Integer> left = new ArrayList<>();
         ArrayList<Integer> right = new ArrayList<>();
 
-        for (CursorJoiner.Result result : joiner) {
-            if (result == CursorJoiner.Result.RIGHT)
-                right.add(getInt(cursorRight, columnRight));
-            else if (result == CursorJoiner.Result.LEFT)
-                left.add(getInt(cursorLeft, columnLeft));
+        for (DescIntCursorJoiner.Result result : joiner) {
+            if (result == DescIntCursorJoiner.Result.RIGHT && onRight != null)
+                onRight.accept(getInt(cursorRight, columnRight));
+//                right.add(getInt(cursorRight, columnRight));
+            else if (result == DescIntCursorJoiner.Result.LEFT && onLeft != null)
+                onLeft.accept(getInt(cursorLeft, columnLeft));
+//                left.add(getInt(cursorLeft, columnLeft));
         }
 
         // Because the stupid CursorJoiner only works in ascending order,
         // we need to reverse the lists before we iterate through them to
         // call the consumers.
-        Collections.reverse(left);
-        Collections.reverse(right);
-
-        if (onLeft != null)
-            for (Integer i : left)
-                onLeft.accept(i);
-        if (onRight != null)
-            for (Integer i : right)
-                onRight.accept(i);
+//        Collections.reverse(left);
+//        Collections.reverse(right);
+//
+//        if (onLeft != null)
+//            for (Integer i : left)
+//                onLeft.accept(i);
+//        if (onRight != null)
+//            for (Integer i : right)
+//                onRight.accept(i);
     }
 
 

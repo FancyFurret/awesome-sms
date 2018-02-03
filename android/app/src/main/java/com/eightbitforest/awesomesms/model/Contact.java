@@ -7,13 +7,13 @@ public class Contact {
 
     private int id;
     private String name;
-    private ArrayList<String> addresses;
+    private ArrayList<Phone> phones;
     private byte[] photo;
 
-    public Contact(int id, String name, ArrayList<String> addresses, byte[] photo) {
+    public Contact(int id, String name, ArrayList<Phone> phones, byte[] photo) {
         this.id = id;
         this.name = name;
-        this.addresses = addresses;
+        this.phones = phones;
         this.photo = photo;
     }
 
@@ -22,8 +22,35 @@ public class Contact {
         return "Contact{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", addresses=" + addresses +
+                ", phones=" + phones +
                 ", photo=" + Arrays.toString(photo) +
                 '}';
+    }
+
+    public static class Phone {
+
+        private String number;
+        private int type;
+
+        public Phone(String number, int type) {
+            this.number = number;
+            this.type = type;
+        }
+
+        public String getNumber() {
+            return number;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        @Override
+        public String toString() {
+            return "Address{" +
+                    "number='" + number + '\'' +
+                    ", type=" + type +
+                    '}';
+        }
     }
 }

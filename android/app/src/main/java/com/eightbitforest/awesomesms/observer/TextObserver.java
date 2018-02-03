@@ -3,7 +3,6 @@ package com.eightbitforest.awesomesms.observer;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
@@ -23,7 +22,13 @@ import java.util.ArrayList;
 import static android.provider.Telephony.Mms;
 import static android.provider.Telephony.MmsSms;
 import static android.provider.Telephony.Sms;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.*;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.close;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.closeAllCursors;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.getCursor;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.getInt;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.getLong;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.getString;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.joinOnInt;
 
 /**
  * The class listens for changes in the content://mms-sms database, and sends the new messages
@@ -80,11 +85,11 @@ public class TextObserver extends AutoContentObserver {
 
             // Try to parse new SMS
             parseAndSendNewMessages(
-                    getCursor(Sms.CONTENT_URI, Sms._ID, contentResolver), Sms._ID, TextMessage.PROTOCOL_SMS);
+                    getCursor(Sms.CONTENT_URI, Sms._ID + " DESC", contentResolver), Sms._ID, TextMessage.PROTOCOL_SMS);
 
             // Try to parse new MMS
             parseAndSendNewMessages(
-                    getCursor(Mms.CONTENT_URI, Mms._ID, contentResolver), Mms._ID, TextMessage.PROTOCOL_MMS);
+                    getCursor(Mms.CONTENT_URI, Mms._ID + " DESC", contentResolver), Mms._ID, TextMessage.PROTOCOL_MMS);
 
         } catch (InvalidCursorException e) {
             Log.w(AwesomeSMS.TAG, e.getMessage());
@@ -95,9 +100,8 @@ public class TextObserver extends AutoContentObserver {
 
     private void parseAndSendNewMessages(Cursor contentCursor, String contentId, byte protocol) throws InvalidCursorException {
         Cursor messageCursor = getCursor(trackingDatabase, TextMessageDB.TABLE_NAME,
-                        TextMessageDB.PROTOCOL + "=" + protocol, TextMessageDB.MESSAGE_ID);
-        CursorJoiner joiner = getCursorJoiner(messageCursor, TextMessageDB.MESSAGE_ID, contentCursor, contentId);
-        joinOnInt(joiner, messageCursor, TextMessageDB.MESSAGE_ID, contentCursor, contentId, null, id -> {
+                TextMessageDB.PROTOCOL + "=" + protocol, TextMessageDB.MESSAGE_ID + " DESC");
+        joinOnInt(messageCursor, TextMessageDB.MESSAGE_ID, contentCursor, contentId, null, id -> {
             try {
                 TextMessage text = parseMessage(id, protocol);
                 if (text == null)
@@ -171,6 +175,8 @@ public class TextObserver extends AutoContentObserver {
                 date = getLong(msgCursor, Sms.DATE);
             }
 
+            close(msgCursor);
+
             // Construct the text message using the found information and return it.
             return new TextMessage(
                     id,
@@ -199,7 +205,7 @@ public class TextObserver extends AutoContentObserver {
         try {
             // Get part cursor
             String where = Mms.Part.MSG_ID + "=" + id;
-            Cursor partCursor = getCursor(MMS_PART, where, null);
+            Cursor partCursor = getCursor(MMS_PART, where, null, contentResolver);
 
             // Extract part data (text, images, etc.)
             String message = null;
@@ -221,6 +227,7 @@ public class TextObserver extends AutoContentObserver {
                     Log.w(AwesomeSMS.TAG, "Unknown Mime type: " + contentType + " for id: " + id);
             } while (partCursor.moveToNext());
 
+            close(partCursor);
             return message;
         } catch (InvalidCursorException e) {
             throw new ParseException(TextMessageDB.ERROR_NO_PART, "MMS had no part for id: " + id);
@@ -251,7 +258,8 @@ public class TextObserver extends AutoContentObserver {
             try {
                 if (inputStream != null)
                     inputStream.close();
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+            }
         }
     }
 
@@ -269,7 +277,7 @@ public class TextObserver extends AutoContentObserver {
             // Get address cursor
             Uri uri = Uri.parse(String.format(MMS_ADDRESS, id));
             String where = Mms.Addr.MSG_ID + "=" + id;
-            Cursor addressCursor = getCursor(uri, where, null);
+            Cursor addressCursor = getCursor(uri, where, null, contentResolver);
 
             // Find all addresses
             ArrayList<TextMessage.Address> addresses = new ArrayList<>();
@@ -299,6 +307,7 @@ public class TextObserver extends AutoContentObserver {
 
             } while (addressCursor.moveToNext());
 
+            close(addressCursor);
             return addresses;
         } catch (InvalidCursorException e) {
             throw new ParseException(TextMessageDB.ERROR_NO_ADDRESS, "Unable to find MMS address for id: " + id);

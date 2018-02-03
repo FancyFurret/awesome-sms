@@ -3,7 +3,6 @@ package com.eightbitforest.awesomesms.observer;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -20,10 +19,10 @@ import static android.provider.ContactsContract.CommonDataKinds.Phone;
 import static android.provider.ContactsContract.CommonDataKinds.Photo;
 import static android.provider.ContactsContract.Contacts;
 import static android.provider.ContactsContract.Data;
+import static com.eightbitforest.awesomesms.observer.ContentHelper.close;
 import static com.eightbitforest.awesomesms.observer.ContentHelper.closeAllCursors;
 import static com.eightbitforest.awesomesms.observer.ContentHelper.getBlob;
 import static com.eightbitforest.awesomesms.observer.ContentHelper.getCursor;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getCursorJoiner;
 import static com.eightbitforest.awesomesms.observer.ContentHelper.getInt;
 import static com.eightbitforest.awesomesms.observer.ContentHelper.getLong;
 import static com.eightbitforest.awesomesms.observer.ContentHelper.getString;
@@ -103,11 +102,10 @@ public class ContactObserver extends AutoContentObserver {
             // Remove deleted contacts
             // Get contacts in our database that aren't already marked for deletion
             Cursor contactCursor = getCursor(trackingDatabase, ContactDB.TABLE_NAME,
-                    ContactDB.REMOVE + "=0", ContactDB.CONTACT_ID);
+                    ContactDB.REMOVE + "=0", ContactDB.CONTACT_ID + " DESC");
             // Get contacts in android's db
-            contentCursor = getCursor(Contacts.CONTENT_URI, Contacts._ID, contentResolver);
-            CursorJoiner joiner = getCursorJoiner(contactCursor, ContactDB.CONTACT_ID, contentCursor, Contacts._ID);
-            joinOnInt(joiner, contactCursor, ContactDB.CONTACT_ID, contentCursor, Contacts._ID, id -> {
+            contentCursor = getCursor(Contacts.CONTENT_URI, Contacts._ID + " DESC", contentResolver);
+            joinOnInt(contactCursor, ContactDB.CONTACT_ID, contentCursor, Contacts._ID, id -> {
                 // Mark to delete in database
                 ContentValues values = new ContentValues();
                 values.put(ContactDB.CONTACT_ID, id);
@@ -137,9 +135,11 @@ public class ContactObserver extends AutoContentObserver {
                 throw new ParseException(ContactDB.ERROR_NO_PHONE, "Cannot find any phone numbers for id: " + id);
 
             String name = getString(phoneCursor, Data.DISPLAY_NAME);
-            ArrayList<String> addresses = new ArrayList<>();
+            ArrayList<Contact.Phone> phones = new ArrayList<>();
             do {
-                addresses.add(getString(phoneCursor, Phone.NUMBER));
+                phones.add(new Contact.Phone(
+                        getString(phoneCursor, Phone.NUMBER),
+                        getInt(phoneCursor, Phone.TYPE)));
             } while (phoneCursor.moveToNext());
 
             // Get thumbnail photo
@@ -153,10 +153,13 @@ public class ContactObserver extends AutoContentObserver {
                 photo = getBlob(thumbnailCursor, Photo.PHOTO);
             }
 
+            close(thumbnailCursor);
+            close(phoneCursor);
+
             return new Contact(
                     id,
                     name,
-                    addresses,
+                    phones,
                     photo);
         } catch (InvalidCursorException e) {
             Log.w(AwesomeSMS.TAG, e.getMessage());
