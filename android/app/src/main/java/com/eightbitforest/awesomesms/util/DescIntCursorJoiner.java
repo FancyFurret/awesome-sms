@@ -11,7 +11,7 @@ import java.util.Iterator;
  * joining on columns that are of int type.
  * <p>
  * Typical usage:
- *
+ * <p>
  * <pre>
  * DescIntCursorJoiner joiner = new DescIntCursorJoiner(cursorA, keyColumnsofA, cursorB, keyColumnsofB);
  * for (CursorJoiner.Result joinerResult : joiner) {
@@ -43,20 +43,27 @@ public class DescIntCursorJoiner
      * The result of a call to next().
      */
     public enum Result {
-        /** The row currently pointed to by the left cursor is unique */
+        /**
+         * The row currently pointed to by the left cursor is unique
+         */
         RIGHT,
-        /** The row currently pointed to by the right cursor is unique */
+        /**
+         * The row currently pointed to by the right cursor is unique
+         */
         LEFT,
-        /** The rows pointed to by both cursors are the same */
+        /**
+         * The rows pointed to by both cursors are the same
+         */
         BOTH
     }
 
     /**
      * Initializes the CursorJoiner and resets the cursors to the first row. The left and right
      * column name arrays must have the same number of columns.
-     * @param cursorLeft The left cursor to compare
-     * @param columnNamesLeft The column names to compare from the left cursor
-     * @param cursorRight The right cursor to compare
+     *
+     * @param cursorLeft       The left cursor to compare
+     * @param columnNamesLeft  The column names to compare from the left cursor
+     * @param cursorRight      The right cursor to compare
      * @param columnNamesRight The column names to compare from the right cursor
      */
     public DescIntCursorJoiner(
@@ -88,7 +95,8 @@ public class DescIntCursorJoiner
 
     /**
      * Lookup the indicies of the each column name and return them in an array.
-     * @param cursor the cursor that contains the columns
+     *
+     * @param cursor      the cursor that contains the columns
      * @param columnNames the array of names to lookup
      * @return an array of column indices
      */
@@ -102,6 +110,7 @@ public class DescIntCursorJoiner
 
     /**
      * Returns whether or not there are more rows to compare using next().
+     *
      * @return true if there are more rows to compare
      */
     public boolean hasNext() {
@@ -136,9 +145,10 @@ public class DescIntCursorJoiner
      * next() are guaranteed to point to the row that was indicated. Reading values
      * from the cursor that was not indicated in the call to next() will result in
      * undefined behavior.
+     *
      * @return LEFT, if the row pointed to by the left cursor is unique, RIGHT
-     *   if the row pointed to by the right cursor is unique, BOTH if the rows in both
-     *   cursors are the same.
+     * if the row pointed to by the right cursor is unique, BOTH if the rows in both
+     * cursors are the same.
      */
     public Result next() {
         if (!hasNext()) {
@@ -166,7 +176,7 @@ public class DescIntCursorJoiner
             }
         } else if (hasLeft) {
             mCompareResult = Result.LEFT;
-        } else  {
+        } else {
             assert hasRight;
             mCompareResult = Result.RIGHT;
         }
@@ -183,16 +193,17 @@ public class DescIntCursorJoiner
      * array and saves them in values beginning at startingIndex, skipping a slot
      * for each value. If columnIndicies has length 3 and startingIndex is 1, the
      * values will be stored in slots 1, 3, and 5.
-     * @param values the Integer[] to populate
-     * @param cursor the cursor from which to read
+     *
+     * @param values         the Integer[] to populate
+     * @param cursor         the cursor from which to read
      * @param columnIndicies the indicies of the values to read from the cursor
-     * @param startingIndex the slot in which to start storing values, and must be either 0 or 1.
+     * @param startingIndex  the slot in which to start storing values, and must be either 0 or 1.
      */
     private static void populateValues(Integer[] values, Cursor cursor, int[] columnIndicies,
                                        int startingIndex) {
         assert startingIndex == 0 || startingIndex == 1;
         for (int i = 0; i < columnIndicies.length; i++) {
-            values[startingIndex + i*2] = cursor.getInt(columnIndicies[i]);
+            values[startingIndex + i * 2] = cursor.getInt(columnIndicies[i]);
         }
     }
 
@@ -223,6 +234,7 @@ public class DescIntCursorJoiner
      * then returns 0. Otherwise returns the comparison result of the first non-matching pair
      * of values, -1 if the first of the pair is less than the second of the pair or 1 if it
      * is greater.
+     *
      * @param values the n pairs of values to compare
      * @return -1, 0, or 1 as described above.
      */
@@ -231,17 +243,17 @@ public class DescIntCursorJoiner
             throw new IllegalArgumentException("you must specify an even number of values");
         }
 
-        for (int index = 0; index < values.length; index+=2) {
+        for (int index = 0; index < values.length; index += 2) {
             if (values[index] == null) {
-                if (values[index+1] == null) continue;
+                if (values[index + 1] == null) continue;
                 return -1;
             }
 
-            if (values[index+1] == null) {
+            if (values[index + 1] == null) {
                 return 1;
             }
 
-            int comp = values[index].compareTo(values[index+1]);
+            int comp = values[index].compareTo(values[index + 1]);
             if (comp != 0) {
                 return comp < 0 ? -1 : 1;
             }

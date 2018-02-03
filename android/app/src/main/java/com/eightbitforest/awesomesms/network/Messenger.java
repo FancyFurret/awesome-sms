@@ -3,9 +3,9 @@ package com.eightbitforest.awesomesms.network;
 import android.util.Log;
 
 import com.eightbitforest.awesomesms.AwesomeSMS;
-import com.eightbitforest.awesomesms.observer.IContactListener;
 import com.eightbitforest.awesomesms.model.Contact;
 import com.eightbitforest.awesomesms.model.TextMessage;
+import com.eightbitforest.awesomesms.observer.IContactListener;
 import com.eightbitforest.awesomesms.observer.ITextListener;
 
 /**

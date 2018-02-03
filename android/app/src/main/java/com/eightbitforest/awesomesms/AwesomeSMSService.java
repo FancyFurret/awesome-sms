@@ -7,8 +7,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.eightbitforest.awesomesms.model.AwesomeSMSDBHelper;
-import com.eightbitforest.awesomesms.model.ContactDB;
-import com.eightbitforest.awesomesms.model.TextMessageDB;
 import com.eightbitforest.awesomesms.network.Messenger;
 import com.eightbitforest.awesomesms.observer.ContactObserver;
 import com.eightbitforest.awesomesms.observer.TextObserver;

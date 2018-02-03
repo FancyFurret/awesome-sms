@@ -10,5 +10,6 @@ import com.eightbitforest.awesomesms.model.TextMessage;
 
 public interface ITextListener {
     void TextSent(TextMessage text);
+
     void TextReceived(TextMessage text);
 }

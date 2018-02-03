@@ -1,9 +1,5 @@
 package com.eightbitforest.awesomesms.model;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-
 /**
  * Hold the various columns and constants used in the text message database.
  *

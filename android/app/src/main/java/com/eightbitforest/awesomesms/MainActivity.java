@@ -1,8 +1,8 @@
 package com.eightbitforest.awesomesms;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * Main activity of the app. Will be used for settings later.

@@ -19,14 +19,14 @@ import static android.provider.ContactsContract.CommonDataKinds.Phone;
 import static android.provider.ContactsContract.CommonDataKinds.Photo;
 import static android.provider.ContactsContract.Contacts;
 import static android.provider.ContactsContract.Data;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.close;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.closeAllCursors;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getBlob;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getCursor;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getInt;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getLong;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getString;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.joinOnInt;
+import static com.eightbitforest.awesomesms.util.ContentHelper.close;
+import static com.eightbitforest.awesomesms.util.ContentHelper.closeAllCursors;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getBlob;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getCursor;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getInt;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getLong;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getString;
+import static com.eightbitforest.awesomesms.util.ContentHelper.joinOnInt;
 
 
 public class ContactObserver extends AutoContentObserver {
@@ -67,52 +67,12 @@ public class ContactObserver extends AutoContentObserver {
 
         try {
             // TODO: These may take a very long time. Move to different thread and show notification
-            // TODO: Clean and move to other methods
 
             // Find any updated contacts
-            Cursor contentCursor = getCursor(Contacts.CONTENT_URI,
-                    Contacts.CONTACT_LAST_UPDATED_TIMESTAMP + ">" + lastUpdate,
-                    Contacts.CONTACT_LAST_UPDATED_TIMESTAMP + " DESC", contentResolver, true);
-            if (contentCursor.getCount() > 0) {
-                lastUpdate = getLong(contentCursor, Contacts.CONTACT_LAST_UPDATED_TIMESTAMP);
-
-                do {
-                    int id = getInt(contentCursor, Contacts._ID);
-                    try {
-                        Contact contact = parseContact(id);
-                        if (contact == null)
-                            continue;
-
-                        // We successfully parsed the contact, so add it to the database
-                        ContentValues values = new ContentValues();
-                        values.put(ContactDB.CONTACT_ID, id);
-                        trackingDatabase.insert(ContactDB.TABLE_NAME, null, values);
-                        listener.ContactUpdated(contact);
-                    } catch (ParseException e) {
-                        // Error parsing the contact
-                        ContentValues values = new ContentValues();
-                        values.put(ContactDB.CONTACT_ID, id);
-                        values.put(ContactDB.ERROR, e.getError());
-                        trackingDatabase.insert(ContactDB.TABLE_NAME, null, values);
-                        Log.e(AwesomeSMS.TAG, e.getMessage());
-                    }
-                } while (contentCursor.moveToNext());
-            }
+            updateContacts();
 
             // Remove deleted contacts
-            // Get contacts in our database that aren't already marked for deletion
-            Cursor contactCursor = getCursor(trackingDatabase, ContactDB.TABLE_NAME,
-                    ContactDB.REMOVE + "=0", ContactDB.CONTACT_ID + " DESC");
-            // Get contacts in android's db
-            contentCursor = getCursor(Contacts.CONTENT_URI, Contacts._ID + " DESC", contentResolver);
-            joinOnInt(contactCursor, ContactDB.CONTACT_ID, contentCursor, Contacts._ID, id -> {
-                // Mark to delete in database
-                ContentValues values = new ContentValues();
-                values.put(ContactDB.CONTACT_ID, id);
-                values.put(ContactDB.REMOVE, true);
-                trackingDatabase.insert(ContactDB.TABLE_NAME, null, values);
-                listener.ContactRemoved(id);
-            }, null);
+            trimContacts();
 
         } catch (InvalidCursorException e) {
             e.printStackTrace();
@@ -120,6 +80,53 @@ public class ContactObserver extends AutoContentObserver {
         } finally {
             closeAllCursors();
         }
+    }
+
+    private void updateContacts() throws InvalidCursorException {
+        Cursor contentCursor = getCursor(Contacts.CONTENT_URI,
+                Contacts.CONTACT_LAST_UPDATED_TIMESTAMP + ">" + lastUpdate,
+                Contacts.CONTACT_LAST_UPDATED_TIMESTAMP + " DESC", contentResolver, true);
+        if (contentCursor.getCount() > 0) {
+            lastUpdate = getLong(contentCursor, Contacts.CONTACT_LAST_UPDATED_TIMESTAMP);
+
+            do {
+                int id = getInt(contentCursor, Contacts._ID);
+                try {
+                    Contact contact = parseContact(id);
+                    if (contact == null)
+                        continue;
+
+                    // We successfully parsed the contact, so add it to the database
+                    ContentValues values = new ContentValues();
+                    values.put(ContactDB.CONTACT_ID, id);
+                    trackingDatabase.insert(ContactDB.TABLE_NAME, null, values);
+                    listener.ContactUpdated(contact);
+                } catch (ParseException e) {
+                    // Error parsing the contact
+                    ContentValues values = new ContentValues();
+                    values.put(ContactDB.CONTACT_ID, id);
+                    values.put(ContactDB.ERROR, e.getError());
+                    trackingDatabase.insert(ContactDB.TABLE_NAME, null, values);
+                    Log.e(AwesomeSMS.TAG, e.getMessage());
+                }
+            } while (contentCursor.moveToNext());
+        }
+    }
+
+    private void trimContacts() throws InvalidCursorException {
+        // Get contacts in our database that aren't already marked for deletion
+        Cursor contactCursor = getCursor(trackingDatabase, ContactDB.TABLE_NAME,
+                ContactDB.REMOVE + "=0", ContactDB.CONTACT_ID + " DESC");
+        // Get contacts in android's db
+        Cursor contentCursor = getCursor(Contacts.CONTENT_URI, Contacts._ID + " DESC", contentResolver);
+        joinOnInt(contactCursor, ContactDB.CONTACT_ID, contentCursor, Contacts._ID, id -> {
+            // Mark to delete in database
+            ContentValues values = new ContentValues();
+            values.put(ContactDB.CONTACT_ID, id);
+            values.put(ContactDB.REMOVE, true);
+            trackingDatabase.insert(ContactDB.TABLE_NAME, null, values);
+            listener.ContactRemoved(id);
+        }, null);
     }
 
     public Contact parseContact(int id) throws ParseException {

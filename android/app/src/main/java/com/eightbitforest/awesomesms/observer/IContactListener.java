@@ -8,5 +8,6 @@ import com.eightbitforest.awesomesms.model.Contact;
 
 public interface IContactListener {
     void ContactUpdated(Contact contact);
+
     void ContactRemoved(int id);
 }

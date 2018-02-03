@@ -1,21 +1,18 @@
-package com.eightbitforest.awesomesms.observer;
+package com.eightbitforest.awesomesms.util;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
-import com.eightbitforest.awesomesms.util.DescIntCursorJoiner;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.function.Consumer;
 
 
-class ContentHelper {
+public class ContentHelper {
 
     private static ArrayList<Cursor> cursors = new ArrayList<>();
 
@@ -27,7 +24,7 @@ class ContentHelper {
      * @return The first cursor in the specified table with the specified sort.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
-    static Cursor getCursor(Uri uri, String sort, ContentResolver contentResolver) throws InvalidCursorException {
+    public static Cursor getCursor(Uri uri, String sort, ContentResolver contentResolver) throws InvalidCursorException {
         return getCursor(uri, null, sort, contentResolver);
     }
 
@@ -40,7 +37,7 @@ class ContentHelper {
      * @return The first cursor in the specified table with the specified sort.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
-    static Cursor getCursor(Uri uri, String where, String sort, ContentResolver contentResolver) throws InvalidCursorException {
+    public static Cursor getCursor(Uri uri, String where, String sort, ContentResolver contentResolver) throws InvalidCursorException {
         return getCursor(uri, where, sort, contentResolver, false);
     }
 
@@ -54,7 +51,7 @@ class ContentHelper {
      * @return The first cursor in the specified table with the specified sort.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
-    static Cursor getCursor(Uri uri, String where, String sort, ContentResolver contentResolver, boolean allowNone) throws InvalidCursorException {
+    public static Cursor getCursor(Uri uri, String where, String sort, ContentResolver contentResolver, boolean allowNone) throws InvalidCursorException {
         Cursor cursor = contentResolver.query(uri, null, where, null, sort);
         cursors.add(cursor);
         if (cursor == null)
@@ -74,7 +71,7 @@ class ContentHelper {
      * @return The first cursor in the specified table with the specified sort. May have 0 items.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
-    static Cursor getCursor(SQLiteDatabase database, String table, String sort) throws InvalidCursorException {
+    public static Cursor getCursor(SQLiteDatabase database, String table, String sort) throws InvalidCursorException {
         return getCursor(database, table, null, sort);
     }
 
@@ -88,7 +85,7 @@ class ContentHelper {
      * @return The first cursor in the specified table with the specified sort. May have 0 items.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
-    static Cursor getCursor(SQLiteDatabase database, String table, String where, String sort) throws InvalidCursorException {
+    public static Cursor getCursor(SQLiteDatabase database, String table, String where, String sort) throws InvalidCursorException {
         Cursor cursor = database.query(table, null, where, null, null, null, sort);
         cursors.add(cursor);
         if (cursor == null) // Not checking cursor.moveToFirst() because this can have 0 results
@@ -105,9 +102,9 @@ class ContentHelper {
      *
      * @param protocol The protocol of the messages to compare.
      */
-    static void joinOnInt(Cursor cursorLeft, String columnLeft,
-                          Cursor cursorRight, String columnRight,
-                          Consumer<Integer> onLeft, Consumer<Integer> onRight) {
+    public static void joinOnInt(Cursor cursorLeft, String columnLeft,
+                                 Cursor cursorRight, String columnRight,
+                                 Consumer<Integer> onLeft, Consumer<Integer> onRight) {
         DescIntCursorJoiner joiner = new DescIntCursorJoiner(
                 cursorLeft, new String[]{columnLeft},
                 cursorRight, new String[]{columnRight});
@@ -118,24 +115,9 @@ class ContentHelper {
         for (DescIntCursorJoiner.Result result : joiner) {
             if (result == DescIntCursorJoiner.Result.RIGHT && onRight != null)
                 onRight.accept(getInt(cursorRight, columnRight));
-//                right.add(getInt(cursorRight, columnRight));
             else if (result == DescIntCursorJoiner.Result.LEFT && onLeft != null)
                 onLeft.accept(getInt(cursorLeft, columnLeft));
-//                left.add(getInt(cursorLeft, columnLeft));
         }
-
-        // Because the stupid CursorJoiner only works in ascending order,
-        // we need to reverse the lists before we iterate through them to
-        // call the consumers.
-//        Collections.reverse(left);
-//        Collections.reverse(right);
-//
-//        if (onLeft != null)
-//            for (Integer i : left)
-//                onLeft.accept(i);
-//        if (onRight != null)
-//            for (Integer i : right)
-//                onRight.accept(i);
     }
 
 
@@ -146,7 +128,7 @@ class ContentHelper {
      * @param column The name of the column to find.
      * @return The string value at the specified column.
      */
-    static String getString(Cursor cursor, String column) {
+    public static String getString(Cursor cursor, String column) {
         return cursor.getString(cursor.getColumnIndexOrThrow(column));
     }
 
@@ -157,7 +139,7 @@ class ContentHelper {
      * @param column The name of the column to find.
      * @return The int value at the specified column.
      */
-    static int getInt(Cursor cursor, String column) {
+    public static int getInt(Cursor cursor, String column) {
         return cursor.getInt(cursor.getColumnIndexOrThrow(column));
     }
 
@@ -168,7 +150,7 @@ class ContentHelper {
      * @param column The name of the column to find.
      * @return The long value at the specified column.
      */
-    static long getLong(Cursor cursor, String column) {
+    public static long getLong(Cursor cursor, String column) {
         return cursor.getLong(cursor.getColumnIndexOrThrow(column));
     }
 
@@ -179,7 +161,7 @@ class ContentHelper {
      * @param column The name of the column to find.
      * @return The byte array at the specified column.
      */
-    static byte[] getBlob(Cursor cursor, String column) {
+    public static byte[] getBlob(Cursor cursor, String column) {
         return cursor.getBlob(cursor.getColumnIndexOrThrow(column));
     }
 
@@ -188,12 +170,12 @@ class ContentHelper {
      *
      * @param cursor The cursor to close, may be null.
      */
-    static void close(@Nullable Cursor cursor) {
+    public static void close(@Nullable Cursor cursor) {
         if (cursor != null)
             cursor.close();
     }
 
-    static void closeAllCursors() {
+    public static void closeAllCursors() {
         for (Cursor cursor : cursors)
             close(cursor);
         cursors.clear();

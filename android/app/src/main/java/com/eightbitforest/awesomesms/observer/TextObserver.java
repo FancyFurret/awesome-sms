@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import static android.provider.Telephony.Mms;
 import static android.provider.Telephony.MmsSms;
 import static android.provider.Telephony.Sms;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.close;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.closeAllCursors;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getCursor;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getInt;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getLong;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.getString;
-import static com.eightbitforest.awesomesms.observer.ContentHelper.joinOnInt;
+import static com.eightbitforest.awesomesms.util.ContentHelper.close;
+import static com.eightbitforest.awesomesms.util.ContentHelper.closeAllCursors;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getCursor;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getInt;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getLong;
+import static com.eightbitforest.awesomesms.util.ContentHelper.getString;
+import static com.eightbitforest.awesomesms.util.ContentHelper.joinOnInt;
 
 /**
  * The class listens for changes in the content://mms-sms database, and sends the new messages

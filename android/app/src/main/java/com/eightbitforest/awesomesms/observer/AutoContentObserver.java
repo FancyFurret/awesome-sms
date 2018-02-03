@@ -2,18 +2,9 @@ package com.eightbitforest.awesomesms.observer;
 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
-import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
-
-import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
-import static com.eightbitforest.awesomesms.observer.ContentHelper.*;
 
 
 public abstract class AutoContentObserver extends ContentObserver {
