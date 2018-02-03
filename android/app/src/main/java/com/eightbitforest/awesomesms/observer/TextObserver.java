@@ -39,8 +39,6 @@ import static com.eightbitforest.awesomesms.util.ContentHelper.joinOnInt;
  * received messages.
  * <p>
  * Relies on a bunch of undocumented features that could break with any android update. Yay.
- * <p>
- * The bitterness in my comments is completely justified.
  *
  * @author Forrest Jones
  */
@@ -52,17 +50,15 @@ public class TextObserver extends AutoContentObserver {
     private static final Uri MMS_PART = Uri.parse("content://mms/part");
     private static final String MMS_ADDRESS = "content://mms/%s/addr";
 
-    /**
-     * The listener to send text updates to.
-     */
+    /** The listener to send text updates to. */
     private ITextListener listener;
 
     /**
-     * Creates the text observer.
+     * Creates a TextObserver.
      *
      * @param listener        The listener to send text updates to.
      * @param messageDatabase The database that holds all messages that have already been parsed.
-     *                        Should be created with TextMessageDB.Helper
+     *                        Should be created with TextMessageDB.Helper.
      * @param contentResolver Android's content resolver to get content providers.
      */
     public TextObserver(ITextListener listener, SQLiteDatabase messageDatabase, ContentResolver contentResolver) {
@@ -98,6 +94,14 @@ public class TextObserver extends AutoContentObserver {
         }
     }
 
+    /**
+     * Finds all new messages, parses them, and notifies the ITextListener.
+     *
+     * @param contentCursor The cursor to Android's SMS or MMS messages.
+     * @param contentId     The id column used for contentCursor.
+     * @param protocol      Are we parsing SMS or MMS.
+     * @throws InvalidCursorException If there was an error getting a cursor to the tracking database.
+     */
     private void parseAndSendNewMessages(Cursor contentCursor, String contentId, byte protocol) throws InvalidCursorException {
         Cursor messageCursor = getCursor(trackingDatabase, TextMessageDB.TABLE_NAME,
                 TextMessageDB.PROTOCOL + "=" + protocol, TextMessageDB.MESSAGE_ID + " DESC");
@@ -132,16 +136,18 @@ public class TextObserver extends AutoContentObserver {
     }
 
     /**
-     * Main meat of this class. Assumes that the message is ready for parsing.
+     * Main meat of this class. Assumes that the message is ready for parsing. Creates
+     * a TextMessage from data in the SMS or MMS database.
      *
      * @param id       The id of the message to parse.
      * @param protocol The protocol of the message.
-     * @return True if the parse was successful.
+     * @return A TextMessage object created with the data in Android's database.
+     * @throws ParseException If there was any error parsing the message.
      */
     public TextMessage parseMessage(int id, byte protocol) throws ParseException {
         try {
             // Get the cursor pointing to the message to parse.
-            Cursor msgCursor = getTextMsgCursor(id, protocol, contentResolver);
+            Cursor msgCursor = getTextMsgCursor(id, protocol);
 
             // Get the msgBox (inbox or sent)
             byte msgBox = getTextMsgBox(msgCursor, protocol);
@@ -197,6 +203,7 @@ public class TextObserver extends AutoContentObserver {
      * Retrieves the part data from an mms message. This includes the text message, images,
      * sound, videos, etc.
      *
+     * @param id          The id of the message.
      * @param attachments Where to store the found attachments.
      * @return The string message.
      * @throws ParseException If the part data could not be parsed.
@@ -265,7 +272,7 @@ public class TextObserver extends AutoContentObserver {
 
     /**
      * Gets the addresses from an MMS. Addresses are stored in a separate table so this queries
-     * that table. Can give duplicate addresses. Cause' google.
+     * that table. Can give duplicate addresses.
      *
      * @param id The id of the message to use.
      * @return A list of all the address associated with the message.
@@ -371,8 +378,9 @@ public class TextObserver extends AutoContentObserver {
      * @param id       The id of the message to find.
      * @param protocol The protocol of the message.
      * @return The correct cursor pointing the the message with the specified id.
+     * @throws InvalidCursorException If there was an error getting the message cursor.
      */
-    private static Cursor getTextMsgCursor(int id, byte protocol, ContentResolver contentResolver) throws InvalidCursorException {
+    private Cursor getTextMsgCursor(int id, byte protocol) throws InvalidCursorException {
         if (protocol == TextMessage.PROTOCOL_SMS)
             return getCursor(Sms.CONTENT_URI, Sms._ID + "=" + id, Sms.DEFAULT_SORT_ORDER, contentResolver);
         else

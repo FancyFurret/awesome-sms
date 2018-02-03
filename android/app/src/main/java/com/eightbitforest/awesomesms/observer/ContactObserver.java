@@ -28,25 +28,28 @@ import static com.eightbitforest.awesomesms.util.ContentHelper.getLong;
 import static com.eightbitforest.awesomesms.util.ContentHelper.getString;
 import static com.eightbitforest.awesomesms.util.ContentHelper.joinOnInt;
 
-
+/**
+ * The class listens for changes in the content://com.android.contact/contact database, and sends
+ * and contact updates or deletions to an IContactListener. Once a contact has been updated,
+ * it is added to the contact database so it doesn't updated again.
+ *
+ * @author Forrest Jones
+ */
 public class ContactObserver extends AutoContentObserver {
 
-    /**
-     * The listener to send contact updates to.
-     */
+    /** The listener to send contact updates to. */
     private IContactListener listener;
 
     // TODO: Store in shared prefs
+    /** Stores the time at which the last contact was updated */
     private long lastUpdate;
 
     /**
-     * Creates the contact observer.
+     * Creates a ContactObserver.
      *
      * @param listener        The listener to send contact updates to.
      * @param contactDatabase The database that holds all contacts that have already been parsed.
-     *                        MUST include the following columns:
-     *                        _id - The contact id.
-     *                        error - Any error encountered during parsing.
+     *                        Should be created with ContactDB.Helper.
      * @param contentResolver Android's content resolver to get content providers.
      */
     public ContactObserver(IContactListener listener, SQLiteDatabase contactDatabase, ContentResolver contentResolver) {
@@ -54,7 +57,6 @@ public class ContactObserver extends AutoContentObserver {
 
         this.listener = listener;
     }
-
 
     /**
      * Gets called whenever the content://com.android.contact/contact database has been changed.
@@ -82,6 +84,13 @@ public class ContactObserver extends AutoContentObserver {
         }
     }
 
+    /**
+     * Finds any updated contacts (contacts that were changed after the lastUpdate), parses
+     * them, adds them to the trackingDatabase, and fires the IContactListener.
+     *
+     * @throws InvalidCursorException If a cursor to one of the updated contacts can't be found,
+     *                                or if there are no updated contacts.
+     */
     private void updateContacts() throws InvalidCursorException {
         Cursor contentCursor = getCursor(Contacts.CONTENT_URI,
                 Contacts.CONTACT_LAST_UPDATED_TIMESTAMP + ">" + lastUpdate,
@@ -89,6 +98,7 @@ public class ContactObserver extends AutoContentObserver {
         if (contentCursor.getCount() > 0) {
             lastUpdate = getLong(contentCursor, Contacts.CONTACT_LAST_UPDATED_TIMESTAMP);
 
+            // Loop through all updated contacts
             do {
                 int id = getInt(contentCursor, Contacts._ID);
                 try {
@@ -113,6 +123,12 @@ public class ContactObserver extends AutoContentObserver {
         }
     }
 
+    /**
+     * Finds any contact that are in the trackingDatabase but not in Android's db, and marks them
+     * for removal and fires the IContactListener.
+     *
+     * @throws InvalidCursorException If there was an error retrieving all contacts.
+     */
     private void trimContacts() throws InvalidCursorException {
         // Get contacts in our database that aren't already marked for deletion
         Cursor contactCursor = getCursor(trackingDatabase, ContactDB.TABLE_NAME,
@@ -129,6 +145,13 @@ public class ContactObserver extends AutoContentObserver {
         }, null);
     }
 
+    /**
+     * Loads the correct contact using the given ID and parses it into a Contact object.
+     *
+     * @param id The id fo the contact to parse.
+     * @return A contact object created with information from the contact database.
+     * @throws ParseException If there was any error parsing the contact.
+     */
     public Contact parseContact(int id) throws ParseException {
         try {
             // The only information we care about is phone numbers.

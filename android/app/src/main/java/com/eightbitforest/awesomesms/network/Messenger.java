@@ -13,7 +13,6 @@ import com.eightbitforest.awesomesms.observer.ITextListener;
  *
  * @author Forrest Jones
  */
-
 public class Messenger implements ITextListener, IContactListener {
 
     @Override

@@ -11,12 +11,13 @@ import com.eightbitforest.awesomesms.network.Messenger;
 import com.eightbitforest.awesomesms.observer.ContactObserver;
 import com.eightbitforest.awesomesms.observer.TextObserver;
 
+// TODO: Ask for permissions
+
 /**
  * Service that starts the content observers.
  *
  * @author Forrest Jones
  */
-// TODO: Ask for permissions
 public class AwesomeSMSService extends Service {
 
     // TODO: start sticky

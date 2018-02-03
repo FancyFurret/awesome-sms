@@ -8,7 +8,6 @@ import java.util.ArrayList;
  *
  * @author Forrest Jones
  */
-
 public class TextMessage {
 
     public static final byte PROTOCOL_SMS = 0;
@@ -26,6 +25,18 @@ public class TextMessage {
     private byte protocol;
     private byte box;
 
+    /**
+     * Constructs a TextMessage.
+     *
+     * @param id          The id of the message.
+     * @param message     The body of the message.
+     * @param addresses   List of addresses associated with contacts in the conversation.
+     * @param attachments List of attachments sent with this message.
+     * @param thread      The id of the conversation.
+     * @param date        When the message was sent.
+     * @param protocol    SMS or MMS.
+     * @param box         Sent or received.
+     */
     public TextMessage(int id, String message, ArrayList<Address> addresses, ArrayList<Attachment> attachments, int thread, long date, byte protocol, byte box) {
         this.id = id;
         this.message = message;
@@ -83,15 +94,25 @@ public class TextMessage {
                 '}';
     }
 
+    /**
+     * Helper class to store necessary information about an address.
+     */
     public static class Address {
 
         public static final byte TYPE_TO = 0;
         public static final byte TYPE_FROM = 1;
+        /** Used for other people in a group message */
         public static final byte TYPE_CC = 2;
 
         private String address;
         private byte type;
 
+        /**
+         * Constructs an Address.
+         *
+         * @param address The phone number.
+         * @param type    The type (TYPE_TO, TYPE_FROM, TYPE_CC)
+         */
         public Address(String address, byte type) {
             this.address = address;
             this.type = type;
@@ -114,10 +135,19 @@ public class TextMessage {
         }
     }
 
+    /**
+     * Helper class to store necessary information about an attachment.
+     */
     public static class Attachment {
         private String type;
         private byte[] data;
 
+        /**
+         * Constructs an Attachment.
+         *
+         * @param type The mime type of the attachment.
+         * @param data The raw data of the attachment.
+         */
         public Attachment(String type, byte[] data) {
             this.type = type;
             this.data = data;

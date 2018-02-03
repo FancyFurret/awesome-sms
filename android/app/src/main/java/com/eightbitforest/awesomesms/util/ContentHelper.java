@@ -11,16 +11,22 @@ import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-
+/**
+ * Contains a bunch of helpful method for dealing with cursors.
+ *
+ * @author Forrest Jones
+ */
 public class ContentHelper {
 
+    /** Stores a list of all returned cursors so they can easily be closed later. */
     private static ArrayList<Cursor> cursors = new ArrayList<>();
 
     /**
      * Helper method to query a table and get a cursor. Will return the first item.
      *
-     * @param uri  The table to query.
-     * @param sort How to sort the table.
+     * @param uri             The table to query.
+     * @param sort            How to sort the table.
+     * @param contentResolver The content resolver to use to get the cursor.
      * @return The first cursor in the specified table with the specified sort.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
@@ -31,9 +37,10 @@ public class ContentHelper {
     /**
      * Helper method to query a table and get a cursor. Will return the first item.
      *
-     * @param uri   The table to query.
-     * @param where 'Where' clause to pass to sql.
-     * @param sort  How to sort the table.
+     * @param uri             The table to query.
+     * @param where           'Where' clause to pass to sql.
+     * @param sort            How to sort the table.
+     * @param contentResolver The content resolver to use to get the cursor.
      * @return The first cursor in the specified table with the specified sort.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
@@ -44,10 +51,11 @@ public class ContentHelper {
     /**
      * Helper method to query a table and get a cursor. Will return the first item.
      *
-     * @param uri       The table to query.
-     * @param where     'Where' clause to pass to sql.
-     * @param sort      How to sort the table.
-     * @param allowNone Whether to check if the cursor found any rows.
+     * @param uri             The table to query.
+     * @param where           'Where' clause to pass to sql.
+     * @param sort            How to sort the table.
+     * @param contentResolver The content resolver to use to get the cursor.
+     * @param allowNone       Whether to check if the cursor found any rows.
      * @return The first cursor in the specified table with the specified sort.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
      */
@@ -67,6 +75,7 @@ public class ContentHelper {
      * an SQLiteDatabase instead of a URI.
      *
      * @param database The SQLiteDatabase to query.
+     * @param table    The table in the database to use.
      * @param sort     How to sort the table.
      * @return The first cursor in the specified table with the specified sort. May have 0 items.
      * @throws InvalidCursorException If the cursor could not be found or is invalid.
@@ -80,6 +89,7 @@ public class ContentHelper {
      * an SQLiteDatabase instead of a URI.
      *
      * @param database The SQLiteDatabase to query.
+     * @param table    The table in the database to use.
      * @param where    'Where' clause to pass to sql.
      * @param sort     How to sort the table.
      * @return The first cursor in the specified table with the specified sort. May have 0 items.
@@ -95,12 +105,17 @@ public class ContentHelper {
     }
 
     /**
-     * The OnChange method so helpfully leaves out the very important information of which
-     * row changed because that would just be too easy. Instead I have to make a whole database
-     * just to see which rows were added. This method compares my text messages database
-     * with android's databases to find which messages have been added.
+     * Joins two cursors on one column. Allows you to see which items are unique to either
+     * database. Must be sorted in descending order, and the joined columns must be integers.
      *
-     * @param protocol The protocol of the messages to compare.
+     * @param cursorLeft  Cursor to the left database.
+     * @param columnLeft  Column to join on the left database.
+     * @param cursorRight Cursor to the right database.
+     * @param columnRight Column to join on the left database.
+     * @param onLeft      Function to call when the left database has a unique row. Passes the
+     *                    value of the joined column.
+     * @param onRight     Function to call when the right database has a unique row. Passes the
+     *                    value of the joined column.
      */
     public static void joinOnInt(Cursor cursorLeft, String columnLeft,
                                  Cursor cursorRight, String columnRight,
@@ -108,9 +123,6 @@ public class ContentHelper {
         DescIntCursorJoiner joiner = new DescIntCursorJoiner(
                 cursorLeft, new String[]{columnLeft},
                 cursorRight, new String[]{columnRight});
-
-        ArrayList<Integer> left = new ArrayList<>();
-        ArrayList<Integer> right = new ArrayList<>();
 
         for (DescIntCursorJoiner.Result result : joiner) {
             if (result == DescIntCursorJoiner.Result.RIGHT && onRight != null)
@@ -171,10 +183,15 @@ public class ContentHelper {
      * @param cursor The cursor to close, may be null.
      */
     public static void close(@Nullable Cursor cursor) {
-        if (cursor != null)
+        if (cursor != null) {
             cursor.close();
+            cursors.remove(cursor);
+        }
     }
 
+    /**
+     * Closes all the cursors that were created by this class.
+     */
     public static void closeAllCursors() {
         for (Cursor cursor : cursors)
             close(cursor);

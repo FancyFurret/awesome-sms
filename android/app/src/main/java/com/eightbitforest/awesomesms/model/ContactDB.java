@@ -14,6 +14,7 @@ public class ContactDB {
     public static final String SENT = "sent";
     public static final String ERROR = "error";
 
+    /** If this contact has no phone numbers attached */
     public static final byte ERROR_NO_PHONE = 1;
 
     static final String SQL_CREATE_CONTACTS =
