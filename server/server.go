@@ -5,6 +5,7 @@ import (
 	//"io"
 	//"log"
 	"github.com/osum4est/awesome-sms-server/database"
+	"github.com/osum4est/awesome-sms-server/json"
 	"net/http"
 )
 
@@ -36,12 +37,48 @@ func status(w http.ResponseWriter, r *http.Request) {
 
 func newMessage(w http.ResponseWriter, r *http.Request) {
 	if ensureMethod(w, r, POST) {
-		var message Message
-		Decode(&r.Body, &message)
-
+		var message json.MessageJson
+		json.Decode(&r.Body, &message)
 		fmt.Println("Got message:", message)
+
+		// Insert message into database
+		// 1) insert message into messages database
+		// 2) insert attachments into attachment database
+		// 3) IF thread does not exist, create it
+
+		// Get sender and addresses
+		var sender string
+		addresses := make([]string, 0)
+		for _, address := range message.Addresses {
+			if !contains(addresses, address.Address) {
+				addresses = append(addresses, address.Address)
+			}
+			if address.Type == json.MessageAddressTypeFrom {
+				sender = address.Address
+			}
+		}
+		// Insert into message table
+		err := db.MessageTable.Insert(message.Id, message.Date, message.Protocol, message.ThreadId, sender, message.Body)
+		if err != nil {
+			sendError(w, err.Error())
+			return
+		}
+
+		// Insert the thread if it doesn't exist
+		db.ThreadParticipantTable.InsertIfNotExists(message.ThreadId, addresses)
+
 		sendResponse(w, "Success", "status")
 	}
+}
+
+// TODO: Do something with this...
+func contains(array []string, item string) bool {
+	for _, arrayItem := range array {
+		if item == arrayItem {
+			return true
+		}
+	}
+	return false
 }
 
 ////////////////////
@@ -49,12 +86,12 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 ////////////////////
 
 func sendResponse(w http.ResponseWriter, value interface{}, path ...string) {
-	var response json
+	var response json.Json
 	response.Set(value, path...)
 	sendResponseJson(w, response)
 }
 
-func sendResponseJson(w http.ResponseWriter, response json) {
+func sendResponseJson(w http.ResponseWriter, response json.Json) {
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(w, response.GetString())
 }

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"strings"
 )
 
 // Currently unused, may be used in future
@@ -16,14 +17,14 @@ const (
 )
 
 type DB struct {
-	sqlDb           *sql.DB
+	sqlDb *sql.DB
 
 	// Tables
-	messageTable    *messageTable
-	attachmentTable *attachmentTable
-	threadParticipantTable *threadParticipantTable
-	contactTable *contactTable
-	contactPhoneTable *contactPhoneTable
+	MessageTable           *messageTable
+	AttachmentTable        *attachmentTable
+	ThreadParticipantTable *threadParticipantTable
+	ContactTable           *contactTable
+	ContactPhoneTable      *contactPhoneTable
 }
 
 func (db *DB) Open() {
@@ -35,16 +36,20 @@ func (db *DB) Open() {
 	}
 
 	// Initialize tables with the database
-	db.messageTable = &messageTable{db.sqlDb}
-	db.attachmentTable = &attachmentTable{db.sqlDb}
-	db.threadParticipantTable = &threadParticipantTable{db.sqlDb}
-	db.contactTable = &contactTable{db.sqlDb}
-	db.contactPhoneTable = &contactPhoneTable{db.sqlDb}
+	db.MessageTable = &messageTable{db.sqlDb}
+	db.AttachmentTable = &attachmentTable{db.sqlDb}
+	db.ThreadParticipantTable = &threadParticipantTable{db.sqlDb}
+	db.ContactTable = &contactTable{db.sqlDb}
+	db.ContactPhoneTable = &contactPhoneTable{db.sqlDb}
 
 	// Create the tables if they don't already exist
-	db.messageTable.createIfNotExists()
-	db.attachmentTable.createIfNotExists()
-	db.threadParticipantTable.createIfNotExists()
-	db.contactTable.createIfNotExists()
-	db.contactPhoneTable.createIfNotExists()
+	db.MessageTable.createIfNotExists()
+	db.AttachmentTable.createIfNotExists()
+	db.ThreadParticipantTable.createIfNotExists()
+	db.ContactTable.createIfNotExists()
+	db.ContactPhoneTable.createIfNotExists()
+}
+
+func isErrorUniqueConstraintFailed(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "UNIQUE constraint failed")
 }

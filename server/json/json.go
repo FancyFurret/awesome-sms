@@ -1,16 +1,15 @@
-package main
+package json
 
 import (
 	encjson "encoding/json"
-	//	"fmt"
 	"io"
 )
 
-type json struct {
+type Json struct {
 	data map[string]interface{}
 }
 
-func (json *json) Set(value interface{}, path ...string) {
+func (json *Json) Set(value interface{}, path ...string) {
 	// Lazy initialization of data
 	if json.data == nil {
 		json.data = make(map[string]interface{})
@@ -32,7 +31,7 @@ func (json *json) Set(value interface{}, path ...string) {
 	previous[path[len(path)-1]] = value
 }
 
-func (json *json) GetString() string {
+func (json *Json) GetString() string {
 	val, _ := encjson.Marshal(json.data)
 	return string(val)
 }

@@ -14,7 +14,7 @@ const (
 	attachmentColDataPath  = "data_path"
 
 	attachmentCreateTableSql = "CREATE TABLE IF NOT EXISTS " + attachmentTableName + " (" +
-		attachmentColId + " integer PRIMARY KEY," +
+		attachmentColId + " integer PRIMARY KEY AUTO INCREMEMNT," +
 		attachmentColMessageId + " integer NOT NULL," +
 		attachmentColMime + " text NOT NULL," +
 		attachmentColDataPath + " text NOT NULL" +
