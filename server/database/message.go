@@ -17,13 +17,13 @@ const (
 	messageColBody     = "body"
 
 	messageCreateTableSql = "CREATE TABLE IF NOT EXISTS " + messageTableName + " (" +
-		messageColId + " integer PRIMARY KEY," +
+		messageColId + " integer NOT NULL," +
 		messageColDate + " integer NOT NULL," +
 		messageColProtocol + " integer NOT NULL," +
 		messageColThreadId + " integer NOT NULL," +
 		messageColSender + " text," + // Null if you sent
-		messageColBody + " text" + // Message body can be null
-		");"
+		messageColBody + " text," + // Message body can be null
+		"UNIQUE(" + messageColId + "," + messageColProtocol + "));"
 )
 
 type messageTable struct {

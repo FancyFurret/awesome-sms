@@ -41,11 +41,6 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 		json.Decode(&r.Body, &message)
 		fmt.Println("Got message:", message)
 
-		// Insert message into database
-		// 1) insert message into messages database
-		// 2) insert attachments into attachment database
-		// 3) IF thread does not exist, create it
-
 		// Get sender and addresses
 		var sender string
 		addresses := make([]string, 0)
@@ -62,6 +57,11 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			sendError(w, err.Error())
 			return
+		}
+
+		// Insert attachments (1 at a time because it is easier and it's extremely rare to have multiple
+		for _, attachment := range message.Attachments {
+			db.AttachmentTable.Insert(message.Id, attachment.Mime, attachment.Data)
 		}
 
 		// Insert the thread if it doesn't exist
