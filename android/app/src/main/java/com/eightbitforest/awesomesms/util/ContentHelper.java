@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.function.Consumer;
 
 /**
@@ -193,8 +194,9 @@ public class ContentHelper {
      * Closes all the cursors that were created by this class.
      */
     public static void closeAllCursors() {
-        for (Cursor cursor : cursors)
+        for (Cursor cursor : cursors.toArray(new Cursor[cursors.size()])) {
             close(cursor);
-        cursors.clear();
+            cursors.remove(cursor);
+        }
     }
 }

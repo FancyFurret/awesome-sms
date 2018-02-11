@@ -8,7 +8,5 @@ import com.eightbitforest.awesomesms.model.TextMessage;
  * @author Forrest Jones
  */
 public interface ITextListener {
-    void TextSent(TextMessage text);
-
-    void TextReceived(TextMessage text);
+    void NewText(TextMessage text);
 }

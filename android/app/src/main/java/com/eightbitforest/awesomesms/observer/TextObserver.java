@@ -117,10 +117,7 @@ public class TextObserver extends AutoContentObserver {
                 values.put(TextMessageDB.PROTOCOL, protocol);
                 trackingDatabase.insert(TextMessageDB.TABLE_NAME, null, values);
 
-                if (text.getBox() == TextMessage.BOX_SENT)
-                    listener.TextSent(text);
-                else
-                    listener.TextReceived(text);
+                listener.NewText(text);
 
             } catch (ParseException e) {
                 // There was some unexpected error parsing the message. We still need to add it to the database
@@ -191,8 +188,7 @@ public class TextObserver extends AutoContentObserver {
                     attachments,
                     thread,
                     date,
-                    protocol,
-                    msgBox);
+                    protocol);
         } catch (InvalidCursorException e) {
             Log.w(AwesomeSMS.TAG, e.getMessage());
             return null;
@@ -229,7 +225,7 @@ public class TextObserver extends AutoContentObserver {
                         ContentType.isSupportedAudioType(contentType) ||
                         ContentType.isSupportedVideoType(contentType)) {
                     int partId = getInt(partCursor, Mms.Part._ID);
-                    attachments.add(new TextMessage.Attachment(contentType, getMmsPartPartBytes(partId)));
+                    attachments.add(new TextMessage.Attachment(partId, contentType, getMmsPartPartBytes(partId)));
                 } else
                     Log.w(AwesomeSMS.TAG, "Unknown Mime type: " + contentType + " for id: " + id);
             } while (partCursor.moveToNext());

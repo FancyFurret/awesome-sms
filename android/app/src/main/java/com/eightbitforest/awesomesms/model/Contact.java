@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 /**
  * This class houses all the information needed for a contact. This class only supports a contact
- * name, photo, and phone number, as that is the only relevant information to a messaging app.
+ * name, thumbnail, and phone number, as that is the only relevant information to a messaging app.
  *
  * @author Forrest Jones
  */
@@ -14,7 +14,7 @@ public class Contact {
     private int id;
     private String name;
     private ArrayList<Phone> phones;
-    private byte[] photo;
+    private byte[] thumbnail;
 
     /**
      * Constructs a Contact.
@@ -22,13 +22,13 @@ public class Contact {
      * @param id     The id of the contact.
      * @param name   The first and last name of the contact.
      * @param phones List of all the phones this contact has.
-     * @param photo  Raw thumbnail photo data.
+     * @param thumbnail  Raw thumbnail photo data.
      */
-    public Contact(int id, String name, ArrayList<Phone> phones, byte[] photo) {
+    public Contact(int id, String name, ArrayList<Phone> phones, byte[] thumbnail) {
         this.id = id;
         this.name = name;
         this.phones = phones;
-        this.photo = photo;
+        this.thumbnail = thumbnail;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class Contact {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", phones=" + phones +
-                ", photo=" + Arrays.toString(photo) +
+                ", thumbnail=" + Arrays.toString(thumbnail) +
                 '}';
     }
 
