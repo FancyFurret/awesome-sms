@@ -2,8 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/osum4est/awesome-sms-server/model"
+	"strings"
 )
 
 const (
@@ -34,13 +35,34 @@ func (table *messageTable) createIfNotExists() {
 	execOrThrow(table.sqlDb, messageCreateTableSql)
 }
 
-func (table *messageTable) Insert(id int, date int64, protocol byte, threadId int, sender string, body string) error {
-	_, err := table.sqlDb.Exec("INSERT INTO "+messageTableName+" VALUES(?, ?, ?, ?, ?, ?);",
-		id, date, protocol, threadId, sender, body)
-	if isErrorUniqueConstraintFailed(err) {
-		return errors.New("Message with that id already exists!")
-	} else if err != nil {
+func (table *messageTable) Insert(messages ...*model.MessageJson) {
+	stmt := "INSERT OR IGNORE INTO " + messageTableName + " VALUES"
+	data := make([]interface{}, len(messages)*6) // Each message has 6 columns
+
+	// Compile all messages into 1 query
+	for i, message := range messages {
+		// Get sender
+		var sender string
+		for _, address := range message.Addresses {
+			if address.Type == model.MessageAddressTypeFrom {
+				sender = address.Address
+			}
+		}
+
+		// Add to stmt and data
+		stmt += "(?,?,?,?,?,?),"
+		data[i*6+0] = message.Id
+		data[i*6+1] = message.Date
+		data[i*6+2] = message.Protocol
+		data[i*6+3] = message.ThreadId
+		data[i*6+4] = sender
+		data[i*6+5] = message.Body
+	}
+	stmt = strings.TrimRight(stmt, ",")
+
+	// Insert messages into db
+	_, err := table.sqlDb.Exec(stmt, data...)
+	if err != nil {
 		panic(err)
 	}
-	return nil
 }

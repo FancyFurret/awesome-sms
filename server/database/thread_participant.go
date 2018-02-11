@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/osum4est/awesome-sms-server/model"
 	"strings"
 )
 
@@ -14,7 +15,8 @@ const (
 
 	threadParticipantCreateTableSql = "CREATE TABLE IF NOT EXISTS " + threadParticipantTableName + " (" +
 		threadParticipantColThreadId + " integer NOT NULL," +
-		threadParticipantColPhone + " text NOT NULL" +
+		threadParticipantColPhone + " text NOT NULL," +
+		"UNIQUE(" + threadParticipantColThreadId + "," + threadParticipantColPhone + ")" +
 		");"
 )
 
@@ -26,29 +28,37 @@ func (table *threadParticipantTable) createIfNotExists() {
 	execOrThrow(table.sqlDb, threadParticipantCreateTableSql)
 }
 
-func (table *threadParticipantTable) InsertIfNotExists(thread_id int, addresses []string) error {
-	// See if thread already exists
-	rowErr := table.sqlDb.QueryRow("SELECT * FROM "+threadParticipantTableName+
-		" WHERE "+threadParticipantColThreadId+"=?;", thread_id).Scan()
-	if rowErr != sql.ErrNoRows {
-		return nil
-	}
-
-	// Make statement
-	stmt := "INSERT INTO " + threadParticipantTableName + " VALUES"
-	stmt += strings.Repeat("(?, ?),", len(addresses))
-	stmt = strings.TrimRight(stmt, ",")
-
-	// Make data
+func (table *threadParticipantTable) InsertFromMessages(messages ...*model.MessageJson) {
+	stmt := "INSERT OR IGNORE INTO " + threadParticipantTableName + " VALUES"
 	data := make([]interface{}, 0)
-	for _, address := range addresses {
-		data = append(data, thread_id, address)
+
+	// Compile all thread participants into 1 query
+	for _, message := range messages {
+		addresses := make([]string, 0)
+		for _, address := range message.Addresses {
+			if !contains(addresses, address.Address) {
+				addresses = append(addresses, address.Address)
+				// Add to stmt and data
+				stmt += "(?, ?),"
+				data = append(data, message.ThreadId, address.Address)
+			}
+		}
 	}
+	stmt = strings.TrimRight(stmt, ",")
 
 	// Execute sql
 	_, err := table.sqlDb.Exec(stmt, data...)
 	if err != nil {
 		panic(err)
 	}
-	return nil
+}
+
+// TODO: Do something with this...
+func contains(array []string, item string) bool {
+	for _, arrayItem := range array {
+		if item == arrayItem {
+			return true
+		}
+	}
+	return false
 }

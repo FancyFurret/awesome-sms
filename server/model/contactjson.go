@@ -1,4 +1,4 @@
-package json
+package model
 
 type ContactJson struct {
 	Id        int

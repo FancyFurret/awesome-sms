@@ -1,4 +1,4 @@
-package json
+package model
 
 type MessageJson struct {
 	Id          int
@@ -22,6 +22,7 @@ type MessageAddressJson struct {
 }
 
 type MessageAttachmentJson struct {
+	Id   int
 	Mime string
 	Data []byte
 }
