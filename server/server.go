@@ -12,8 +12,9 @@ import (
 const (
 	port = "11150"
 
-	GET  = "GET"
-	POST = "POST"
+	GET    = "GET"
+	POST   = "POST"
+	DELETE = "DELETE"
 )
 
 var db *database.DB
@@ -26,6 +27,8 @@ func main() {
 
 	http.HandleFunc("/status", status)
 	http.HandleFunc("/new_message", newMessage)
+	http.HandleFunc("/update_contact", updateContact)
+	http.HandleFunc("/delete_contact", deleteContact)
 	fmt.Println(http.ListenAndServe(":"+port, nil))
 }
 
@@ -66,6 +69,39 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 
 		// Insert the thread if it doesn't exist
 		db.ThreadParticipantTable.InsertIfNotExists(message.ThreadId, addresses)
+
+		sendResponse(w, "Success", "status")
+	}
+}
+
+func updateContact(w http.ResponseWriter, r *http.Request) {
+	if ensureMethod(w, r, POST) {
+		var contact json.ContactJson
+		json.Decode(&r.Body, &contact)
+		fmt.Println("Got contact:", contact)
+
+		// Insert the new contact into the table
+		db.ContactTable.Insert(contact.Id, contact.Name, contact.Thumbnail)
+
+		// Delete the old phone numbers and insert the new ones
+		db.ContactPhoneTable.Delete(contact.Id)
+		for _, phone := range contact.Phones {
+			db.ContactPhoneTable.Insert(contact.Id, phone.Number, phone.Type)
+		}
+
+		sendResponse(w, "Success", "status")
+	}
+}
+
+func deleteContact(w http.ResponseWriter, r *http.Request) {
+	if ensureMethod(w, r, DELETE) {
+		var contact json.ContactJson
+		json.Decode(&r.Body, &contact)
+		fmt.Println("Deleting contact:", contact)
+
+		// Delete the contact and their phone numbers
+		db.ContactTable.Delete(contact.Id)
+		db.ContactPhoneTable.Delete(contact.Id)
 
 		sendResponse(w, "Success", "status")
 	}

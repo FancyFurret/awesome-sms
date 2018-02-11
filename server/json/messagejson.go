@@ -17,8 +17,8 @@ const (
 )
 
 type MessageAddressJson struct {
-	Type    byte
 	Address string
+	Type    byte
 }
 
 type MessageAttachmentJson struct {
