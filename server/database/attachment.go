@@ -46,8 +46,10 @@ func (table *attachmentTable) InsertFromMessages(messages ...*model.MessageJson)
 	stmt = strings.TrimRight(stmt, ",")
 
 	// Insert attachments into db
-	_, err := table.sqlDb.Exec(stmt, data...)
-	if err != nil {
-		panic(err)
+	if len(data) > 0 {
+		_, err := table.sqlDb.Exec(stmt, data...)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
