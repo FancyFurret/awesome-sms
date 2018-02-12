@@ -1,5 +1,7 @@
 package com.eightbitforest.awesomesms.model;
 
+import android.util.Base64;
+
 import java.util.ArrayList;
 
 /**
@@ -132,28 +134,28 @@ public class TextMessage {
      */
     public static class Attachment {
         private int id;
-        private String type;
+        private String mime;
         private byte[] data;
 
         /**
          * Constructs an Attachment.
          *
          * @param id   The id of the attachment.
-         * @param type The mime type of the attachment.
+         * @param mime The mime type of the attachment.
          * @param data The raw data of the attachment.
          */
-        public Attachment(int id, String type, byte[] data) {
+        public Attachment(int id, String mime, byte[] data) {
             this.id = id;
-            this.type = type;
-            this.data = data;
+            this.mime = mime;
+            this.data = Base64.encode(data, Base64.DEFAULT);
         }
 
         public int getId() {
             return id;
         }
 
-        public String getType() {
-            return type;
+        public String getMime() {
+            return mime;
         }
 
         public byte[] getData() {
@@ -164,7 +166,7 @@ public class TextMessage {
         public String toString() {
             return "Attachment{" +
                     "id=" + id +
-                    ", type='" + type + '\'' +
+                    ", mime='" + mime + '\'' +
                     '}';
         }
     }

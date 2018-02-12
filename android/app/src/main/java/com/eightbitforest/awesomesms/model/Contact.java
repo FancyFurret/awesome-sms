@@ -1,5 +1,7 @@
 package com.eightbitforest.awesomesms.model;
 
+import android.util.Base64;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -19,16 +21,17 @@ public class Contact {
     /**
      * Constructs a Contact.
      *
-     * @param id     The id of the contact.
-     * @param name   The first and last name of the contact.
-     * @param phones List of all the phones this contact has.
-     * @param thumbnail  Raw thumbnail photo data.
+     * @param id        The id of the contact.
+     * @param name      The first and last name of the contact.
+     * @param phones    List of all the phones this contact has.
+     * @param thumbnail Raw thumbnail photo data.
      */
     public Contact(int id, String name, ArrayList<Phone> phones, byte[] thumbnail) {
         this.id = id;
         this.name = name;
         this.phones = phones;
-        this.thumbnail = thumbnail;
+        if (thumbnail != null)
+            this.thumbnail = Base64.encode(thumbnail, Base64.DEFAULT);
     }
 
     @Override

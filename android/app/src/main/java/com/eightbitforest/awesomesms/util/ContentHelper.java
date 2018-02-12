@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.function.Consumer;
 
 /**

@@ -32,4 +32,5 @@ dependencies {
 
     compile 'com.klinkerapps:android-smsmms:4.3.0'
     compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.android.volley:volley:1.1.0'
 }

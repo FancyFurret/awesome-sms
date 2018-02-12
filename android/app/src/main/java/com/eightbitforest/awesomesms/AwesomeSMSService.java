@@ -23,7 +23,7 @@ public class AwesomeSMSService extends Service {
     // TODO: start sticky
     @Override
     public void onCreate() {
-        Messenger messenger = new Messenger();
+        Messenger messenger = new Messenger(getBaseContext());
         AwesomeSMSDBHelper helper = new AwesomeSMSDBHelper(getBaseContext());
         SQLiteDatabase database = helper.getWritableDatabase();
 

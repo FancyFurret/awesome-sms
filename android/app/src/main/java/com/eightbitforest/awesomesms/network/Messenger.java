@@ -1,7 +1,12 @@
 package com.eightbitforest.awesomesms.network;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.eightbitforest.awesomesms.AwesomeSMS;
 import com.eightbitforest.awesomesms.model.Contact;
 import com.eightbitforest.awesomesms.model.TextMessage;
@@ -19,24 +24,71 @@ import org.json.JSONObject;
  */
 public class Messenger implements ITextListener, IContactListener {
 
-    private static final String IP = "192.168.1.79:11150"; // TODO: Move to settings
-    private Gson gson;
+    // private static final String IP = "http://192.168.1.79:11150"; // TODO: Move to settings
+    private static final String IP = "http://192.168.42.205:11150"; // TODO: Move to settings
+    private static final String INSERT_MESSAGE = "/insert_message";
+    private static final String UPDATE_CONTACT = "/update_contact";
+    private static final String DELETE_CONTACT = "/delete_contact";
 
-    public Messenger() {
+    private Gson gson;
+    private RequestQueue requestQueue;
+
+    public Messenger(Context context) {
         this.gson = new Gson();
+        requestQueue = Volley.newRequestQueue(context);
     }
 
     @Override
     public void NewText(TextMessage text) {
-        Log.i(AwesomeSMS.TAG, "Message JSON: " + gson.toJson(text));
+        // TODO: Attachments can be big. Send separately?
+        try {
+            Log.i(AwesomeSMS.TAG, "Sending: " + new JSONObject(gson.toJson(text)).toString());
+            JsonObjectRequest request = new JsonObjectRequest(IP + INSERT_MESSAGE, new JSONObject(gson.toJson(text)),
+                    response -> Log.i(AwesomeSMS.TAG, "Successfully sent message to server! " + response),
+                    error -> Log.e(AwesomeSMS.TAG, "Unable to send message to server!" + error)) {
+            };
+            request.setRetryPolicy(new DefaultRetryPolicy(5000,
+                    5,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(request);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void ContactUpdated(Contact contact) {
-        Log.i(AwesomeSMS.TAG, "Contact JSON: " + gson.toJson(contact));
+        try {
+            Log.i(AwesomeSMS.TAG, "Sending: " + new JSONObject(gson.toJson(contact)).toString());
+            JsonObjectRequest request = new JsonObjectRequest(IP + UPDATE_CONTACT, new JSONObject(gson.toJson(contact)),
+                    response -> Log.i(AwesomeSMS.TAG, "Successfully sent message to server! " + response),
+                    error -> Log.e(AwesomeSMS.TAG, "Unable to send message to server!" + error)) {
+            };
+            request.setRetryPolicy(new DefaultRetryPolicy(5000,
+                    5,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(request);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void ContactRemoved(int id) {
+        try {
+            JSONObject removedContact = new JSONObject();
+            removedContact.put("id", id);
+            Log.i(AwesomeSMS.TAG, "Sending: " + removedContact.toString());
+            JsonObjectRequest request = new JsonObjectRequest(IP + DELETE_CONTACT, removedContact,
+                    response -> Log.i(AwesomeSMS.TAG, "Successfully sent message to server! " + response),
+                    error -> Log.e(AwesomeSMS.TAG, "Unable to send message to server!" + error)) {
+            };
+            request.setRetryPolicy(new DefaultRetryPolicy(5000,
+                    5,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(request);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
