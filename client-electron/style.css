@@ -58,10 +58,12 @@ html, body{
 .threads-container {
     float: left;
     width: 35%;
+    height: 100%;
 }
 
 .threads {
-    padding: 10px;
+    height: 100%;
+    overflow-y: scroll;
 }
 
 .threads li {
@@ -72,7 +74,6 @@ html, body{
     height: var(--thread-height);
     display: flex;
     align-items: center;
-    /*border: 1px solid white; !* TEMP *!*/
 }
 
 .thread-thumbnail {
@@ -130,15 +131,14 @@ html, body{
 .messages-container {
     display: flex;
     flex-direction: column-reverse;
-    /*overflow: scroll;*/
     overflow-y: scroll;
     flex: 1;
 }
 
-.messages-container::-webkit-scrollbar {
+::-webkit-scrollbar {
     background: transparent;
 }
-.messages-container::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background: #454545;
     border-radius: 30px;
 }
