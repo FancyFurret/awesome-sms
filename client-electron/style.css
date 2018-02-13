@@ -1,0 +1,192 @@
+@import url(reset.css);
+
+:root {
+    --background-color: #323232;
+    --foreground-color: #e2e2e2;
+    --thread-preview-color: #bbbbbb;
+
+    --thread-height: 75px;
+    --thread-thumbnail-size: 50px;
+}
+
+@font-face {
+    font-family: roboto-regular;
+    src: url(fonts/Roboto-Regular.ttf);
+}
+
+@font-face {
+    font-family: material-icons;
+    src: url(fonts/MaterialIcons-Regular.woff);
+}
+
+.material-icons {
+    font-family: material-icons, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+}
+
+body {
+    background-color: #323232;
+    color: #e2e2e2;
+
+    font-family: roboto-regular, sans-serif;
+}
+
+html, body{
+    height:100%;
+}
+
+.threads-container {
+    float: left;
+    width: 35%;
+}
+
+.threads {
+    padding: 10px;
+}
+
+.threads li {
+    list-style: none;
+}
+
+.thread {
+    height: var(--thread-height);
+    display: flex;
+    align-items: center;
+    /*border: 1px solid white; !* TEMP *!*/
+}
+
+.thread-thumbnail {
+    height: var(--thread-thumbnail-size);
+    width: var(--thread-thumbnail-size);
+    background-color: #2196F3;
+    border-radius: 100%;
+    float: left;
+    margin-left: 15px;
+}
+
+.thread-thumbnail-text {
+    padding-top: 50%;
+    line-height: 0;
+    padding-bottom: 50%;
+
+    text-align: center;
+    font-weight: bold;
+}
+
+.thread-information {
+    float: left;
+    padding-left: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    height: var(--thread-height);
+}
+
+.thread-contact-name {
+    margin: 5px
+}
+
+.thread-preview-text {
+    margin: 5px;
+    font-size: .85em;
+    color: var(--thread-preview-color)
+}
+
+.conversation-container {
+    height: 100%;
+    float: right;
+    width: 65%;
+}
+
+.conversation {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.messages-container {
+    display: flex;
+    flex-direction: column-reverse;
+    /*overflow: scroll;*/
+    overflow-y: scroll;
+    flex: 1;
+}
+
+.messages-container::-webkit-scrollbar {
+    background: transparent;
+}
+.messages-container::-webkit-scrollbar-thumb {
+    background: #454545;
+    border-radius: 30px;
+}
+
+.message {
+    padding: 6px;
+    margin: 6px;
+    border-radius: 12px;
+    max-width: 70%;
+    clear: both;
+}
+
+.message-sent {
+    background-color: #454545;
+    float: right;
+}
+
+.message-received {
+    background-color: #2196F3;
+    float: left;
+}
+
+.entry-bar {
+    margin: 6px;
+    display: flex;
+}
+
+.entry-bar-input {
+    flex: 1;
+    height: 30px;
+    margin-right: 5px;
+    background-color: transparent;
+    border: none;
+    color: var(--foreground-color);
+    font-size: 1em;
+}
+
+.entry-bar-input:focus {
+    outline: none;
+}
+
+.entry-bar-send {
+    margin-left: 5px;
+    background-color: transparent;
+    color: var(--foreground-color);
+    border: none;
+}
+
+.entry-bar-send:focus {
+    outline: none;
+}
