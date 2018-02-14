@@ -26,6 +26,7 @@ function newThread(thread) {
     $("#threads").append(
         templateThreadThumbnailText(
             {
+                id: thread.id,
                 thumbnail: abbr,
                 color: thread.participants[0].color,
                 name: thread.participants[0].name,
@@ -44,6 +45,7 @@ function newMessage(message) {
     $("#messages").append(
         templateMessage(
             {
+                id: message.id,
                 color: message.sender == null ? colorSent : message.sender.color,
                 sent: message.sender == null,
                 message: message.body

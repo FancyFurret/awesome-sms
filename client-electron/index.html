@@ -14,7 +14,7 @@
     <script src="js/awesome-sms.js"></script>
 
     <script id="template-thread-thumbnail-text" type="text/x-handlebars-template">
-        <div class="thread">
+        <div class="thread" id="thread-{{id}}">
             <div class="thread-thumbnail" style="background-color: {{color}}">
                 <p class="thread-thumbnail-text">{{thumbnail}}</p>
             </div>
@@ -26,7 +26,8 @@
     </script>
     <script id="template-message" type="text/x-handlebars-template">
         <div class="message {{#if sent}}message-sent{{else}}message-received{{/if}}"
-            style="background-color: {{color}}">
+             id="message-{{id}}"
+             style="background-color: {{color}}">
             <p>{{message}}</p>
         </div>
     </script>
