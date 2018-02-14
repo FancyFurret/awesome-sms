@@ -11,12 +11,12 @@
 
 @font-face {
     font-family: roboto-regular;
-    src: url(fonts/Roboto-Regular.ttf);
+    src: url(../fonts/Roboto-Regular.ttf);
 }
 
 @font-face {
     font-family: material-icons;
-    src: url(fonts/MaterialIcons-Regular.woff);
+    src: url(../fonts/MaterialIcons-Regular.woff);
 }
 
 .material-icons {
@@ -45,8 +45,8 @@
 }
 
 body {
-    background-color: #323232;
-    color: #e2e2e2;
+    background-color: var(--background-color);
+    color: var(--foreground-color);
 
     font-family: roboto-regular, sans-serif;
 }
@@ -55,18 +55,18 @@ html, body{
     height:100%;
 }
 
-.threads-container {
+#threads-container {
     float: left;
     width: 35%;
     height: 100%;
 }
 
-.threads {
+#threads {
     height: 100%;
     overflow-y: scroll;
 }
 
-.threads li {
+#threads li {
     list-style: none;
 }
 
@@ -76,10 +76,15 @@ html, body{
     align-items: center;
 }
 
+.thread:hover {
+    background-color: #454545;
+    cursor: pointer;
+}
+
 .thread-thumbnail {
     height: var(--thread-thumbnail-size);
     width: var(--thread-thumbnail-size);
-    background-color: #2196F3;
+    /*background-color: #2196F3;*/
     border-radius: 100%;
     float: left;
     margin-left: 15px;
@@ -115,20 +120,20 @@ html, body{
     color: var(--thread-preview-color)
 }
 
-.conversation-container {
+#conversation-container {
     height: 100%;
     float: right;
     width: 65%;
 }
 
-.conversation {
+#conversation {
     height: 100%;
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-.messages-container {
+#messages-container {
     display: flex;
     flex-direction: column-reverse;
     overflow-y: scroll;
@@ -152,21 +157,19 @@ html, body{
 }
 
 .message-sent {
-    background-color: #454545;
     float: right;
 }
 
 .message-received {
-    background-color: #2196F3;
     float: left;
 }
 
-.entry-bar {
+#entry-bar {
     margin: 6px;
     display: flex;
 }
 
-.entry-bar-input {
+#entry-bar-input {
     flex: 1;
     height: 30px;
     margin-right: 5px;
@@ -176,17 +179,17 @@ html, body{
     font-size: 1em;
 }
 
-.entry-bar-input:focus {
+#entry-bar-input:focus {
     outline: none;
 }
 
-.entry-bar-send {
+#entry-bar-send {
     margin-left: 5px;
     background-color: transparent;
     color: var(--foreground-color);
     border: none;
 }
 
-.entry-bar-send:focus {
+#entry-bar-send:focus {
     outline: none;
 }
