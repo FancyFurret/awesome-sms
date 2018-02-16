@@ -7,13 +7,13 @@ import (
 )
 
 type websocketServer struct {
-	db *database.DB
+	db       *database.DB
 	upgrader *websocket.Upgrader
 }
 
 func NewWebSocketServer(db *database.DB) *websocketServer {
 	return &websocketServer{db, &websocket.Upgrader{
-		ReadBufferSize:1024,
+		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
 			return true
@@ -39,16 +39,26 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 
 		json := message[1].(map[string]interface{})
 		switch message[0] {
-			case "get_new_messages":
-				server.getNewMessages(json, ws)
+		case "get_new_messages":
+			server.getNewMessages(json, ws)
+		case "get_threads":
+			server.getThreads(json, ws)
 		}
 	}
 }
 
 func (server *websocketServer) getNewMessages(json map[string]interface{}, ws *websocket.Conn) {
 	lastDateReceived := int64(json["lastDateReceived"].(float64))
-	newMessages := server.db.MessageTable.GetNewMessages(lastDateReceived, 10)
+	amount := int(json["amount"].(float64))
+	messages := server.db.MessageTable.GetNewMessages(lastDateReceived, amount)
 	// TODO: Lowercase
-	ws.WriteJSON(newMessages)
+	ws.WriteJSON(messages)
 }
 
+func (server *websocketServer) getThreads(json map[string]interface{}, ws *websocket.Conn) {
+	// TODO: Rename because amount is misleading
+	amount := int(json["amount"].(float64))
+	messages := server.db.MessageTable.GetThreads(amount)
+	// TODO: Lowercase
+	ws.WriteJSON(messages)
+}
