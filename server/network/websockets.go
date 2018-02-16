@@ -8,7 +8,7 @@ import (
 
 type websocketServer struct {
 	db *database.DB
-	upgrader *websocket.Upgrader;
+	upgrader *websocket.Upgrader
 }
 
 func NewWebSocketServer(db *database.DB) *websocketServer {
@@ -46,7 +46,9 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 }
 
 func (server *websocketServer) getNewMessages(json map[string]interface{}, ws *websocket.Conn) {
-	//lastDateRecieved := json["lastDateReceived"].(int64)
-	ws.WriteJSON(json["lastDateReceived"])
+	lastDateReceived := int64(json["lastDateReceived"].(float64))
+	newMessages := server.db.MessageTable.GetNewMessages(lastDateReceived, 10)
+	// TODO: Lowercase
+	ws.WriteJSON(newMessages)
 }
 
