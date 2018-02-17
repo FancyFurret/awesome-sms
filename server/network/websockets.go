@@ -5,6 +5,7 @@ import (
 	"github.com/osum4est/awesome-sms-server/database"
 	"net/http"
 	"github.com/osum4est/awesome-sms-server/model"
+	"fmt"
 )
 
 type websocketServer struct {
@@ -42,7 +43,19 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 		message := make([]interface{}, 0)
 		err := ws.ReadJSON(&message)
 		if err != nil {
-			panic(err) // TODO: Send bad request error
+			if _, ok := err.(*websocket.CloseError); ok {
+				// Remove socket from slice
+				for i, socket := range server.sockets {
+					if ws == socket {
+						server.sockets = append(server.sockets[:i], server.sockets[i+1:]...)
+					}
+				}
+
+				fmt.Println(ws.RemoteAddr().String() + " has disconnected")
+				return
+			} else {
+				panic(err) // TODO: Send bad request error
+			}
 		}
 
 		json := message[1].(map[string]interface{})
