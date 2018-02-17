@@ -3,7 +3,7 @@ let templateMessage;
 
 const colorSent = materialColors.grey["800"];
 
-function init() {
+function initUi() {
     let templateThreadThumbnailTextSource = $("#template-thread-thumbnail-text").html();
     templateThreadThumbnailText = Handlebars.compile(templateThreadThumbnailTextSource);
 
@@ -18,22 +18,35 @@ function newThread(thread) {
     }
 
     let abbr = "";
-    let names = thread.participants[0].name.split(' ');
-    abbr += names[0][0].toUpperCase();
-    if (names.length > 1)
-        abbr += names[names.length - 1][0].toUpperCase();
+    let name = "";
+    if (thread.participants[0].name != null) {
+        let names = thread.participants[0].name.split(' ');
+        abbr += names[0][0].toUpperCase();
+        if (names.length > 1)
+            abbr += names[names.length - 1][0].toUpperCase();
+        name = thread.participants[0].name;
+    }
+    else {
+        abbr = "#";
+        name = thread.participants[0].phones[0].number;
+    }
 
-    $("#threads").append(
+
+    let uiThread = $(
         templateThreadThumbnailText(
             {
                 id: thread.id,
                 thumbnail: abbr,
                 color: thread.participants[0].color,
-                name: thread.participants[0].name,
+                name: name,
                 preview: thread.messages[0].body
             }
-        )
-    );
+        ));
+    $("#threads").append(uiThread);
+    uiThread.dotdotdot({
+       truncate: "letter"
+    });
+    return uiThread;
 }
 
 function newMessage(message) {
@@ -42,7 +55,7 @@ function newMessage(message) {
         return false;
     }
 
-    $("#messages").append(
+    let uiMessage = $(
         templateMessage(
             {
                 id: message.id,
@@ -52,4 +65,6 @@ function newMessage(message) {
             }
         )
     );
+    $("#messages").append(uiMessage);
+    return uiMessage;
 }

@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- Thanks: https://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
     <script src="node_modules/material-colors/dist/colors.js"></script>
     <script src="node_modules/handlebars/dist/handlebars.js"></script>
     <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="node_modules/jquery.dotdotdot/dist/jquery.dotdotdot.js"></script>
 
     <script src="js/api/awesome-sms-api.js"></script>
 
     <script src="js/ui.js"></script>
-    <script src="js/awesome-sms.js"></script>
+    <script src="js/client.js"></script>
+
+    <!-- Thanks: https://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined -->
+    <script>if (window.module) module = window.module;</script>
 
     <script id="template-thread-thumbnail-text" type="text/x-handlebars-template">
         <div class="thread" id="thread-{{id}}">
@@ -20,7 +27,7 @@
             </div>
             <div class="thread-information">
                 <p class="thread-contact-name">{{name}}</p>
-                <p class="thread-preview-text">{{preview}}</p>
+                <p class="thread-preview-text ellipsis">{{preview}}</p>
             </div>
         </div>
     </script>
