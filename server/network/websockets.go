@@ -4,11 +4,15 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/osum4est/awesome-sms-server/database"
 	"net/http"
+	"github.com/osum4est/awesome-sms-server/model"
 )
 
 type websocketServer struct {
 	db       *database.DB
 	upgrader *websocket.Upgrader
+
+	// TODO: Allow for multiple users on one server
+	sockets []*websocket.Conn
 }
 
 func NewWebSocketServer(db *database.DB) *websocketServer {
@@ -17,7 +21,8 @@ func NewWebSocketServer(db *database.DB) *websocketServer {
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
 			return true
-		}}}
+		}},
+		make([]*websocket.Conn, 0)}
 }
 
 func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +34,9 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 
 	// Make sure we close the connection when the function returns
 	defer ws.Close()
+
+	// Add to our list of sockets
+	server.sockets = append(server.sockets, ws)
 
 	for {
 		message := make([]interface{}, 0)
@@ -44,6 +52,12 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 		case "get_threads":
 			server.getThreads(json, ws)
 		}
+	}
+}
+
+func (server *websocketServer) broadcastMessages(messages ...*model.MessageJson) {
+	for _, ws := range server.sockets {
+		ws.WriteJSON([2]interface{}{"new_messages", messages})
 	}
 }
 

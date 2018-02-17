@@ -59,6 +59,8 @@ func (server *httpServer) insertMessage(w http.ResponseWriter, r *http.Request) 
 		server.db.ThreadParticipantTable.InsertFromMessages(&message)
 
 		server.sendSuccess(w)
+
+		server.websockets.broadcastMessages(&message)
 	}
 }
 
@@ -73,6 +75,8 @@ func (server *httpServer) insertMessages(w http.ResponseWriter, r *http.Request)
 		server.db.ThreadParticipantTable.InsertFromMessages(messages...)
 
 		server.sendSuccess(w)
+
+		server.websockets.broadcastMessages(messages...)
 	}
 }
 
