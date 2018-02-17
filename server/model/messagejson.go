@@ -1,13 +1,13 @@
 package model
 
 type MessageJson struct {
-	Id          int
-	Date        int64
-	Protocol    byte
-	ThreadId    int
-	Addresses   []MessageAddressJson
-	Body        string
-	Attachments []MessageAttachmentJson
+	Id          int `json:"id"`
+	Date        int64 `json:"date"`
+	Protocol    byte `json:"protocol"`
+	ThreadId    int `json:"threadId"`
+	Addresses   []MessageAddressJson `json:"addresses"`
+	Body        string `json:"body"`
+	Attachments []MessageAttachmentJson `json:"attachments"`
 }
 
 const (
@@ -17,12 +17,12 @@ const (
 )
 
 type MessageAddressJson struct {
-	Address string
-	Type    byte
+	Address string `json:"address"`
+	Type    byte `json:"type"`
 }
 
 type MessageAttachmentJson struct {
-	Id   int
-	Mime string
-	Data []byte
+	Id   int `json:"id"`
+	Mime string `json:"mime"`
+	Data []byte `json:"data"`
 }

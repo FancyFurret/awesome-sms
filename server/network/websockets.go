@@ -51,14 +51,12 @@ func (server *websocketServer) getNewMessages(json map[string]interface{}, ws *w
 	lastDateReceived := int64(json["lastDateReceived"].(float64))
 	amount := int(json["amount"].(float64))
 	messages := server.db.MessageTable.GetNewMessages(lastDateReceived, amount)
-	// TODO: Lowercase
-	ws.WriteJSON(messages)
+	ws.WriteJSON([2]interface{}{"new_messages", messages})
 }
 
 func (server *websocketServer) getThreads(json map[string]interface{}, ws *websocket.Conn) {
 	// TODO: Rename because amount is misleading
 	amount := int(json["amount"].(float64))
 	messages := server.db.MessageTable.GetThreads(amount)
-	// TODO: Lowercase
-	ws.WriteJSON(messages)
+	ws.WriteJSON([2]interface{}{"new_messages", messages})
 }
