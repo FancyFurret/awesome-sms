@@ -11,7 +11,7 @@ function initUi() {
     templateMessage = Handlebars.compile(templateMessageSource);
 }
 
-function newThread(thread) {
+function prependThread(thread) {
     if (thread.participants.length !== 1) {
         console.error("Does not support group messages yet!");
         return false;
@@ -42,14 +42,14 @@ function newThread(thread) {
                 preview: thread.messages[0].body
             }
         ));
-    $("#threads").append(uiThread);
+    $("#threads").prepend(uiThread);
     uiThread.dotdotdot({
        truncate: "letter"
     });
     return uiThread;
 }
 
-function newMessage(message) {
+function prependMessage(message) {
     if (message.thread.participants.length !== 1) {
         console.error("Does not support group messages yet!");
         return false;
@@ -65,6 +65,6 @@ function newMessage(message) {
             }
         )
     );
-    $("#messages").append(uiMessage);
+    $("#messages").prepend(uiMessage);
     return uiMessage;
 }

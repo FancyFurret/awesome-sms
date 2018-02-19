@@ -15,14 +15,14 @@ $(document).ready(function () {
         console.log("Connected to server! Refreshing messages...");
 
         awesomeSms.onMessageReceived = () => {
-            awesomeSms.getThreads().forEach((thread) => {
-                let uiThread = newThread(thread);
+            awesomeSms.getThreadsByDate().forEach((thread) => {
+                let uiThread = prependThread(thread);
                 if (uiThread)
-                    uiThread.click(function () {
+                    uiThread.click(function() {
                         let threadId = parseInt($(this).attr("id").replace("thread-", ""));
                         $("#messages").empty();
-                        for (let i = 0; i < awesomeSms.getThreads().get(threadId).messages.length; i++)
-                            newMessage(awesomeSms.getThreads().get(threadId).messages[i]);
+                        for (let i = 0; i < awesomeSms.getThread(threadId).messages.length; i++)
+                            prependMessage(awesomeSms.getThread(threadId).messages[i]);
                     });
             });
         };
@@ -31,5 +31,4 @@ $(document).ready(function () {
     });
 
     // TODO: Auto select first thread
-    // TODO: Sort messages and threads by date!
 });

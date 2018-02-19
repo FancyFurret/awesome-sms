@@ -60,16 +60,21 @@ class AwesomeSms {
         ]));
     }
 
-    getMessages() {
-        return new Map(this._messages)
+    getMessage(id) {
+        return this._messages.get(id)
     }
 
-    getThreads() {
-        return new Map(this._threads)
+    getThreadsByDate() {
+        return [...this._threads.values()].sort((a, b) =>
+            a.getMostRecentMessage().date - b.getMostRecentMessage().date);
     }
 
-    getContacts() {
-        return new Map(this._contacts)
+    getThread(id) {
+        return this._threads.get(id)
+    }
+
+    getContact(id) {
+        return this._contacts.get(id)
     }
 
     _handleNewMessages(messages) {
@@ -84,7 +89,7 @@ class AwesomeSms {
                     this._contacts.set(address["address"], new Contact(
                         null,
                         null,
-                        [new ContactPhone(address["address"], -1)],
+                        [new ContactPhone(address["address"], address["type"])],
                         null,
                         randomColor()
                     ))
@@ -116,7 +121,7 @@ class AwesomeSms {
                 message["attachments"]
             ));
 
-            this._threads.get(message["threadId"]).messages.push(
+            this._threads.get(message["threadId"]).insertMessage(
                 this._messages.get(message["id"])
             )
         });
