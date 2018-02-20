@@ -28,27 +28,7 @@ function randomColor() {
     // return materialColors[color_name][colors[Math.floor(Math.random() * colors.length)]];
 }
 
-function binaryIndexOf(array, item, compare) {
-    let minIndex = 0;
-    let maxIndex = array.length - 1;
-    let currentIndex;
-    let currentElement;
-
-    while (minIndex <= maxIndex) {
-        currentIndex = (minIndex + maxIndex) / 2 | 0;
-        currentElement = array[currentIndex];
-
-        let compareValue = compare(currentElement, item);
-        if (compareValue > 0) {
-            minIndex = currentIndex + 1;
-        }
-        else if (compareValue < 0) {
-            maxIndex = currentIndex - 1;
-        }
-        else {
-            return currentIndex;
-        }
-    }
-
-    return -1;
+function pushSorted(array, item, compare) {
+    array.push(item);
+    array.sort(compare);
 }

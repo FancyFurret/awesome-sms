@@ -1,3 +1,6 @@
+let selectedThread;
+let awesomeSms;
+
 $(document).ready(function () {
     console.log("loaded");
 
@@ -6,7 +9,7 @@ $(document).ready(function () {
     // TODO: Loading screen
     // TODO: Cache
 
-    let awesomeSms = new AwesomeSms();
+    awesomeSms = new AwesomeSms();
     awesomeSms.connectToServer("localhost:11150", (res) => {
         if (res.error) {
             console.error(res.error);
@@ -15,20 +18,30 @@ $(document).ready(function () {
         console.log("Connected to server! Refreshing messages...");
 
         awesomeSms.onMessageReceived = () => {
+            $("#threads").empty();
             awesomeSms.getThreadsByDate().forEach((thread) => {
                 let uiThread = prependThread(thread);
                 if (uiThread)
                     uiThread.click(function() {
-                        let threadId = parseInt($(this).attr("id").replace("thread-", ""));
-                        $("#messages").empty();
-                        for (let i = 0; i < awesomeSms.getThread(threadId).messages.length; i++)
-                            prependMessage(awesomeSms.getThread(threadId).messages[i]);
+                        selectedThread = $(this);
+                        refreshThreadMessages();
                     });
             });
+
+            if (selectedThread === undefined) {
+                selectedThread = $(".thread").first();
+            }
+
+            refreshThreadMessages();
         };
 
         awesomeSms.refreshMessages();
     });
-
-    // TODO: Auto select first thread
 });
+
+function refreshThreadMessages() {
+    let threadId = parseInt(selectedThread.attr("id").replace("thread-", ""));
+    $("#messages").empty();
+    for (let i = 0; i < awesomeSms.getThread(threadId).messages.length; i++)
+        appendMessage(awesomeSms.getThread(threadId).messages[i]);
+}

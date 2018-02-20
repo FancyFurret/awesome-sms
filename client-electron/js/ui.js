@@ -39,7 +39,7 @@ function prependThread(thread) {
                 thumbnail: abbr,
                 color: thread.participants[0].color,
                 name: name,
-                preview: thread.messages[0].body
+                preview: thread.getMostRecentMessage().body
             }
         ));
     $("#threads").prepend(uiThread);
@@ -49,7 +49,7 @@ function prependThread(thread) {
     return uiThread;
 }
 
-function prependMessage(message) {
+function appendMessage(message) {
     if (message.thread.participants.length !== 1) {
         console.error("Does not support group messages yet!");
         return false;
@@ -65,6 +65,6 @@ function prependMessage(message) {
             }
         )
     );
-    $("#messages").prepend(uiMessage);
+    $("#messages").append(uiMessage);
     return uiMessage;
 }

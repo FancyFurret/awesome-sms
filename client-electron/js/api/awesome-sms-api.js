@@ -78,6 +78,10 @@ class AwesomeSms {
     }
 
     _handleNewMessages(messages) {
+        let newMessages = [];
+        let newThreads = [];
+
+        // TODO: Cache parts of json message/address/etc. so we don't have to keep getting them
         messages.forEach((message) => {
             // Go through address, find sender, and add others to contacts if they don't exist
             let sender = undefined;
@@ -107,7 +111,9 @@ class AwesomeSms {
                     message["threadId"],
                     participants,
                     []
-                ))
+                ));
+
+                newThreads.push(this._threads.get(message["threadId"]));
             }
 
             // Add messages
@@ -123,10 +129,13 @@ class AwesomeSms {
 
             this._threads.get(message["threadId"]).insertMessage(
                 this._messages.get(message["id"])
-            )
+            );
+
+            newMessages.push(this._messages.get(message["id"]))
         });
+
         if (this.onMessageReceived !== undefined)
-            this.onMessageReceived()
+            this.onMessageReceived(newMessages, newThreads)
     }
 
 }
