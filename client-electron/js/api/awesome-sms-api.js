@@ -38,7 +38,7 @@ class AwesomeSms {
         };
 
         this._socket.onopen = () => {
-            this._connnected = true;
+            this._connected = true;
             callback({})
         };
 
@@ -53,11 +53,18 @@ class AwesomeSms {
 
     refreshMessages() {
         this._socket.send(JSON.stringify([
-            "get_threads",
+            "get_new_messages",
             {
+                "lastDateReceived": 1518813830,
                 "amount": 100
             }
         ]));
+        // this._socket.send(JSON.stringify([
+        //     "get_threads",
+        //     {
+        //         "amount": 100
+        //     }
+        // ]));
     }
 
     getMessage(id) {

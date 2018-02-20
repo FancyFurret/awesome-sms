@@ -1,5 +1,6 @@
 let templateThreadThumbnailText;
 let templateMessage;
+let templateMessageImage;
 
 const colorSent = materialColors.grey["800"];
 
@@ -9,6 +10,9 @@ function initUi() {
 
     let templateMessageSource = $("#template-message").html();
     templateMessage = Handlebars.compile(templateMessageSource);
+
+    let templateMessageImageSource = $("#template-message-image").html();
+    templateMessageImage = Handlebars.compile(templateMessageImageSource);
 }
 
 function prependThread(thread) {
@@ -55,16 +59,34 @@ function appendMessage(message) {
         return false;
     }
 
-    let uiMessage = $(
-        templateMessage(
-            {
-                id: message.id,
-                color: message.sender == null ? colorSent : message.sender.color,
-                sent: message.sender == null,
-                message: message.body
-            }
-        )
-    );
-    $("#messages").append(uiMessage);
-    return uiMessage;
+    if (message.attachments != null) {
+        for (let i = 0; i < message.attachments.length; i++) {
+            let uiImage = $(
+                templateMessageImage(
+                    {
+                        id: message.id + "-" + i,
+                        color: message.sender == null ? colorSent : message.sender.color,
+                        sent: message.sender == null,
+                        mime: message.attachments[i].mime,
+                        image: message.attachments[i].data
+                    }
+                )
+            );
+            $("#messages").append(uiImage);
+        }
+    }
+    if (message.body != null) {
+        let uiMessage = $(
+            templateMessage(
+                {
+                    id: message.id,
+                    color: message.sender == null ? colorSent : message.sender.color,
+                    sent: message.sender == null,
+                    message: message.body
+                }
+            )
+        );
+        $("#messages").append(uiMessage);
+    }
+    return true;
 }

@@ -6,6 +6,6 @@ class Message {
         this.thread = thread;
         this.sender = sender; // NULL IF YOU
         this.body = body;
-        this.attachents = attachments;
+        this.attachments = attachments;
     }
 }

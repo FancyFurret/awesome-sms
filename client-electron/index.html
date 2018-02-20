@@ -38,6 +38,11 @@
             <p>{{message}}</p>
         </div>
     </script>
+    <script id="template-message-image" type="text/x-handlebars-template">
+        <img class="message message-image {{#if sent}}message-sent{{else}}message-received{{/if}}"
+             id="message-image-{{id}}"
+             src="data:{{mime}};base64,{{image}}" />
+    </script>
 
     <title>Hello World!</title>
 </head>

@@ -156,6 +156,16 @@ html, body{
     clear: both;
 }
 
+.message-image {
+    padding: 0;
+}
+
+.message-image img {
+    max-width: 100%;
+    border-radius: 12px;
+    padding: 0;
+}
+
 .message-sent {
     float: right;
 }
