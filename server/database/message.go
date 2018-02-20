@@ -28,44 +28,30 @@ const (
 
 	// TODO: Something...
 	messageGetNewMessagesSql = `
-SELECT *
-FROM (
-       SELECT
-         message.id,
-         message.date,
-         message.protocol,
-         message.thread_id,
-         message.sender,
-         message.body,
-         thread_participant.phone,
-         NULL AS attachment_id,
-         NULL AS mime,
-         NULL AS data
-       FROM message
-         LEFT OUTER JOIN thread_participant
-           ON message.thread_id = thread_participant.thread_id
-       UNION
-
-       SELECT
-         message.id,
-         message.date,
-         message.protocol,
-         message.thread_id,
-         message.sender,
-         message.body,
-         NULL          AS phone,
-         attachment.id AS attachment_id,
-         attachment.mime,
-         attachment.data
-       FROM message
-         LEFT OUTER JOIN attachment
-           ON message.id = attachment.message_id
-     ) AS cols
+-- Join and select all data from all tables
+SELECT
+  message.id,
+  message.date,
+  message.protocol,
+  message.thread_id,
+  message.sender,
+  message.body,
+  thread_participant.phone,
+  attachment.id AS attachment_id,
+  attachment.mime,
+  attachment.data
+FROM message
+  -- Select ? latest unique messages
   NATURAL JOIN (SELECT DISTINCT message.id
                 FROM message
+                ORDER BY message.date
+                  DESC
                 LIMIT 0, ?)
-WHERE cols.date>?
-ORDER BY cols.thread_id, cols.id;
+  --   Add phones and attachments (Much faster to do after the natural join
+  LEFT OUTER JOIN thread_participant ON message.thread_id = thread_participant.thread_id
+  LEFT OUTER JOIN attachment ON message.id = attachment.message_id
+WHERE message.date > ?
+ORDER BY message.date DESC;
 `
 
 	// Faster than multiple queries for each thread. Probably...
@@ -111,6 +97,7 @@ WHERE cols.id IN (
   SELECT message.id
   FROM message
   WHERE message.thread_id = cols.thread_id
+  ORDER BY message.date DESC
   LIMIT 0, ?
 )
 ORDER BY cols.thread_id, cols.id;
@@ -179,6 +166,7 @@ func (table *messageTable) GetThreads(amount int) *[]model.MessageJson {
 }
 
 func (table *messageTable) getMessagesFromRows(rows *sql.Rows) *[]model.MessageJson {
+	// TODO: Attachments take a while to send. Send over url instead?
 	messages := make([]model.MessageJson, 0)
 	lastId := -1
 
@@ -208,15 +196,13 @@ func (table *messageTable) getMessagesFromRows(rows *sql.Rows) *[]model.MessageJ
 			panic(err)
 		}
 
-		if lastId != message.Id {
-			messages = append(messages, *message)
-		} else {
-			// Get the already created message if this message has already been created
+		// Get the already created message if this message has already been created
+		if lastId == message.Id {
 			message = &messages[len(messages)-1]
 		}
 
-		// Add phone/attachment data
-		if phone.Valid { // Is a phone row
+		// Add phone
+		if phone.Valid && !containsPhone(&message.Addresses, phone.String) {
 			var addressType byte
 			if sender == phone.String {
 				addressType = model.MessageAddressTypeFrom
@@ -228,7 +214,9 @@ func (table *messageTable) getMessagesFromRows(rows *sql.Rows) *[]model.MessageJ
 				model.MessageAddressJson{
 					Address: phone.String,
 					Type:    addressType})
-		} else { // Is an attachment row
+		}
+		// Add attachments
+		if data != nil && !containsAttachment(&message.Attachments, int(attachmentId.Int64)) {
 			message.Attachments = append(message.Attachments,
 				model.MessageAttachmentJson{
 					Id:   int(attachmentId.Int64),
@@ -236,8 +224,31 @@ func (table *messageTable) getMessagesFromRows(rows *sql.Rows) *[]model.MessageJ
 					Data: data})
 		}
 
+		// Add the message to the array if it hasn't been added yet
+		if lastId != message.Id {
+			messages = append(messages, *message)
+		}
+
 		lastId = message.Id
 	}
 
 	return &messages
+}
+
+func containsPhone(addresses *[]model.MessageAddressJson, phone string) bool {
+	for _, address := range *addresses {
+		if address.Address == phone {
+			return true
+		}
+	}
+	return false
+}
+
+func containsAttachment(attachments *[]model.MessageAttachmentJson, id int) bool {
+	for _, attachment := range *attachments {
+		if attachment.Id == id {
+			return true
+		}
+	}
+	return false
 }

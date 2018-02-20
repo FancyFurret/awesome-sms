@@ -53,3 +53,13 @@ func (db *DB) Open() {
 func isErrorUniqueConstraintFailed(err error) bool {
 	return err != nil && strings.Contains(err.Error(), "UNIQUE constraint failed")
 }
+
+// TODO: Do something with this...
+func contains(array []string, item string) bool {
+	for _, arrayItem := range array {
+		if arrayItem == item {
+			return true
+		}
+	}
+	return false
+}

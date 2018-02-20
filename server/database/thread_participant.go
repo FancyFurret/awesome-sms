@@ -52,13 +52,3 @@ func (table *threadParticipantTable) InsertFromMessages(messages ...*model.Messa
 		panic(err)
 	}
 }
-
-// TODO: Do something with this...
-func contains(array []string, item string) bool {
-	for _, arrayItem := range array {
-		if item == arrayItem {
-			return true
-		}
-	}
-	return false
-}
