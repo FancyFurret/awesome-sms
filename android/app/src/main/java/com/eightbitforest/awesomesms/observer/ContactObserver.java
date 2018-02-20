@@ -2,6 +2,7 @@ package com.eightbitforest.awesomesms.observer;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
@@ -12,6 +13,7 @@ import com.eightbitforest.awesomesms.model.Contact;
 import com.eightbitforest.awesomesms.model.ContactDB;
 import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
 import com.eightbitforest.awesomesms.observer.exception.ParseException;
+import com.eightbitforest.awesomesms.util.Util;
 
 import java.util.ArrayList;
 
@@ -48,12 +50,13 @@ public class ContactObserver extends AutoContentObserver {
      * Creates a ContactObserver.
      *
      * @param listener        The listener to send contact updates to.
+     * @param context         The context of the app.
      * @param contactDatabase The database that holds all contacts that have already been parsed.
      *                        Should be created with ContactDB.Helper.
      * @param contentResolver Android's content resolver to get content providers.
      */
-    public ContactObserver(IContactListener listener, SQLiteDatabase contactDatabase, ContentResolver contentResolver) {
-        super(contactDatabase, contentResolver, ContactsContract.RawContacts.CONTENT_URI);
+    public ContactObserver(IContactListener listener, Context context, SQLiteDatabase contactDatabase, ContentResolver contentResolver) {
+        super(contactDatabase, context, contentResolver, ContactsContract.RawContacts.CONTENT_URI);
 
         this.listener = listener;
     }
@@ -168,7 +171,7 @@ public class ContactObserver extends AutoContentObserver {
             ArrayList<Contact.Phone> phones = new ArrayList<>();
             do {
                 phones.add(new Contact.Phone(
-                        getString(phoneCursor, Phone.NUMBER),
+                        Util.normalizePhone(context, getString(phoneCursor, Phone.NUMBER)),
                         getInt(phoneCursor, Phone.TYPE)));
             } while (phoneCursor.moveToNext());
 

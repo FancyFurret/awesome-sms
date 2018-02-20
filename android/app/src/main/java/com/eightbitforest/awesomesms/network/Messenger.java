@@ -24,8 +24,8 @@ import org.json.JSONObject;
  */
 public class Messenger implements ITextListener, IContactListener {
 
-    // private static final String IP = "http://192.168.1.79:11150"; // TODO: Move to settings
-    private static final String IP = "http://192.168.42.205:11150"; // TODO: Move to settings
+     private static final String IP = "http://192.168.1.79:11150"; // TODO: Move to settings
+//    private static final String IP = "http://192.168.42.205:11150"; // TODO: Move to settings
     private static final String INSERT_MESSAGE = "/insert_message";
     private static final String UPDATE_CONTACT = "/update_contact";
     private static final String DELETE_CONTACT = "/delete_contact";
@@ -40,9 +40,11 @@ public class Messenger implements ITextListener, IContactListener {
 
     @Override
     public void NewText(TextMessage text) {
+        Log.i(AwesomeSMS.TAG, text.toString());
         // TODO: Attachments can be big. Send separately?
+        // FIXME: Object -> Json -> String -> Json is ridiculous and extremely slow.
         try {
-            Log.i(AwesomeSMS.TAG, "Sending: " + new JSONObject(gson.toJson(text)).toString());
+            //Log.i(AwesomeSMS.TAG, "Sending: " + new JSONObject(gson.toJson(text)).toString());
             JsonObjectRequest request = new JsonObjectRequest(IP + INSERT_MESSAGE, new JSONObject(gson.toJson(text)),
                     response -> Log.i(AwesomeSMS.TAG, "Successfully sent message to server! " + response),
                     error -> Log.e(AwesomeSMS.TAG, "Unable to send message to server!" + error)) {

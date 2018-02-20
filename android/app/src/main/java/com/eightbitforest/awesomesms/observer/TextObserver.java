@@ -2,9 +2,12 @@ package com.eightbitforest.awesomesms.observer;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.eightbitforest.awesomesms.AwesomeSMS;
@@ -12,6 +15,7 @@ import com.eightbitforest.awesomesms.model.TextMessage;
 import com.eightbitforest.awesomesms.model.TextMessageDB;
 import com.eightbitforest.awesomesms.observer.exception.InvalidCursorException;
 import com.eightbitforest.awesomesms.observer.exception.ParseException;
+import com.eightbitforest.awesomesms.util.Util;
 import com.google.android.mms.ContentType;
 import com.google.android.mms.pdu_alt.PduHeaders;
 
@@ -53,18 +57,26 @@ public class TextObserver extends AutoContentObserver {
     /** The listener to send text updates to. */
     private ITextListener listener;
 
+    private String myPhoneNumber;
+
     /**
      * Creates a TextObserver.
      *
      * @param listener        The listener to send text updates to.
+     * @param context         The context of the app.
      * @param messageDatabase The database that holds all messages that have already been parsed.
      *                        Should be created with TextMessageDB.Helper.
      * @param contentResolver Android's content resolver to get content providers.
      */
-    public TextObserver(ITextListener listener, SQLiteDatabase messageDatabase, ContentResolver contentResolver) {
-        super(messageDatabase, contentResolver, MmsSms.CONTENT_CONVERSATIONS_URI);
+    public TextObserver(ITextListener listener, Context context, SQLiteDatabase messageDatabase, ContentResolver contentResolver) {
+        super(messageDatabase, context, contentResolver, MmsSms.CONTENT_CONVERSATIONS_URI);
 
         this.listener = listener;
+
+        TelephonyManager t = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        myPhoneNumber = t.getLine1Number();
+        if (myPhoneNumber == null || myPhoneNumber.isEmpty() || myPhoneNumber.contains("?"))
+            Log.e(AwesomeSMS.TAG, "Unable to get your phone number.");
     }
 
     /**
@@ -165,17 +177,30 @@ public class TextObserver extends AutoContentObserver {
 
             if (protocol == TextMessage.PROTOCOL_MMS) {
                 message = getMmsPartData(id, attachments);
-                addresses = getMmsAddresses(id); // TODO: Normalize, remove duplicates
+
+                addresses = getMmsAddresses(id);
+                // WHY CAN THE SAME NUMBER BE IN HERE TWICE AS BOTH TWO AND FROM. WHY
+                if (addresses.size() == 2 &&
+                        PhoneNumberUtils.compare(addresses.get(0).getAddress(), addresses.get(1).getAddress())) {
+                    TextMessage.Address correctAddress = new TextMessage.Address(
+                            Util.normalizePhone(context, addresses.get(0).getAddress()),
+                            msgBox == TextMessage.BOX_INBOX ? TextMessage.Address.TYPE_FROM : TextMessage.Address.TYPE_TO
+                    );
+                    addresses.clear();
+                    addresses.add(correctAddress);
+                    Log.i(AwesomeSMS.TAG, "MMS addresses were the same");
+                }
+
                 thread = getInt(msgCursor, Mms.THREAD_ID);
-                date = getLong(msgCursor, Mms.DATE); // TODO: Normalize dates
+                date = getLong(msgCursor, Mms.DATE);
             } else {
                 message = getString(msgCursor, Sms.BODY);
                 addresses.add(new TextMessage.Address(
-                        getString(msgCursor, Sms.ADDRESS),
+                        Util.normalizePhone(context, getString(msgCursor, Sms.ADDRESS)),
                         msgBox == TextMessage.BOX_INBOX ? TextMessage.Address.TYPE_FROM : TextMessage.Address.TYPE_TO
                 ));
                 thread = getInt(msgCursor, Sms.THREAD_ID);
-                date = getLong(msgCursor, Sms.DATE);
+                date = getLong(msgCursor, Sms.DATE) / 1000; // Because the SMS dates are in milliseconds
             }
 
             close(msgCursor);
@@ -304,13 +329,18 @@ public class TextObserver extends AutoContentObserver {
                         throw new ParseException(TextMessageDB.ERROR_UNKNOWN_ADDRESS_TYPE, "Unknown address type " + addressType);
                 }
 
-                addresses.add(new TextMessage.Address(address, msgAddressType));
-                if (addresses.get(addresses.size() - 1).getAddress() == null)
-                    throw new ParseException(TextMessageDB.ERROR_ADDRESS_NULL, "MMS Address was null for id: " + id);
+                if (!address.equals("insert-address-token") && !PhoneNumberUtils.compare(address, myPhoneNumber)) {
+                    addresses.add(new TextMessage.Address(
+                            Util.normalizePhone(context, address),
+                            msgAddressType));
+                    if (addresses.get(addresses.size() - 1).getAddress() == null)
+                        throw new ParseException(TextMessageDB.ERROR_ADDRESS_NULL, "MMS Address was null for id: " + id);
+                }
 
             } while (addressCursor.moveToNext());
 
             close(addressCursor);
+
             return addresses;
         } catch (InvalidCursorException e) {
             throw new ParseException(TextMessageDB.ERROR_NO_ADDRESS, "Unable to find MMS address for id: " + id);

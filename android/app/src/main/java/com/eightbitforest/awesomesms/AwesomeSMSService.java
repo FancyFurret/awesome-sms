@@ -28,11 +28,11 @@ public class AwesomeSMSService extends Service {
         SQLiteDatabase database = helper.getWritableDatabase();
 
         // Create and register TextObserver
-        TextObserver textObserver = new TextObserver(messenger, database, getContentResolver());
+        TextObserver textObserver = new TextObserver(messenger, getBaseContext(), database, getContentResolver());
         textObserver.register();
 
         // Create and register ContactObserver
-        ContactObserver contactObserver = new ContactObserver(messenger, database, getContentResolver());
+        ContactObserver contactObserver = new ContactObserver(messenger, getBaseContext(), database, getContentResolver());
         contactObserver.register();
     }
 

@@ -1,6 +1,7 @@
 package com.eightbitforest.awesomesms.observer;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.ContentObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -19,6 +20,9 @@ public abstract class AutoContentObserver extends ContentObserver {
     /** A database used be children to store already changed rows. */
     SQLiteDatabase trackingDatabase;
 
+    /** The context of the running application */
+    Context context;
+
     /** The uri that this ContentObserver should observe. */
     private Uri observeUri;
 
@@ -27,13 +31,15 @@ public abstract class AutoContentObserver extends ContentObserver {
      * register().
      *
      * @param trackingDatabase The database to track already changed rows.
+     * @param context         The context of the app.
      * @param contentResolver  Android's content resolver to get content providers.
      * @param observeUri       The uri that this ContentObserver should observe.
      */
-    AutoContentObserver(SQLiteDatabase trackingDatabase, ContentResolver contentResolver, Uri observeUri) {
+    AutoContentObserver(SQLiteDatabase trackingDatabase, Context context, ContentResolver contentResolver, Uri observeUri) {
         super(new Handler());
 
         this.trackingDatabase = trackingDatabase;
+        this.context = context;
         this.contentResolver = contentResolver;
         this.observeUri = observeUri;
     }
