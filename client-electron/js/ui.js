@@ -1,43 +1,40 @@
-let templateThreadThumbnailText;
+// let phoneUtil = require('google-libphonenumber').phoneUtil
+//     , PNF = require('google-libphonenumber').PhoneNumberFormat
+//     , PNT = require('google-libphonenumber').PhoneNumberType;
+
+let templateThread;
 let templateMessage;
-let templateMessageImage;
+// let templateMessageImage;
 
 const colorSent = materialColors.grey["800"];
 
 function initUi() {
-    let templateThreadThumbnailTextSource = $("#template-thread-thumbnail-text").html();
-    templateThreadThumbnailText = Handlebars.compile(templateThreadThumbnailTextSource);
+    let templateThumbnailSource = $("#template-thumbnail").html();
+    let templateThumbnail = Handlebars.compile(templateThumbnailSource);
+    Handlebars.registerPartial("template-thumbnail", templateThumbnail);
+
+    let templateThreadSource = $("#template-thread").html();
+    templateThread = Handlebars.compile(templateThreadSource);
 
     let templateMessageSource = $("#template-message").html();
     templateMessage = Handlebars.compile(templateMessageSource);
-
-    let templateMessageImageSource = $("#template-message-image").html();
-    templateMessageImage = Handlebars.compile(templateMessageImageSource);
 }
 
 function prependThread(thread) {
-    if (thread.participants.length !== 1) {
-        console.error("Does not support group messages yet!");
-        return false;
-    }
-
-    let abbr = "";
+    let abbr = thread.participants.length > 1 ? "#" : thread.participants[0].getAbbreviation();
     let name = "";
-    if (thread.participants[0].name != null) {
-        let names = thread.participants[0].name.split(' ');
-        abbr += names[0][0].toUpperCase();
-        if (names.length > 1)
-            abbr += names[names.length - 1][0].toUpperCase();
-        name = thread.participants[0].name;
-    }
-    else {
-        abbr = "#";
-        name = thread.participants[0].phones[0].number;
-    }
+    for (let i = 0; i < thread.participants.length; i++) {
+        if (i > 0) // More than 1 participant
+            abbr = "#";
+        else
+            abbr = thread.participants[i].getAbbreviation();
 
+        name += thread.participants[i].getDisplayName() + ", ";
+    }
+    name = name.slice(0, -2);
 
     let uiThread = $(
-        templateThreadThumbnailText(
+        templateThread(
             {
                 id: thread.id,
                 thumbnail: abbr,
@@ -48,41 +45,55 @@ function prependThread(thread) {
         ));
     $("#threads").prepend(uiThread);
     uiThread.dotdotdot({
-       truncate: "letter"
+        truncate: "letter"
     });
     return uiThread;
 }
 
 function appendMessage(message) {
-    if (message.thread.participants.length !== 1) {
-        console.error("Does not support group messages yet!");
-        return false;
+    let color = message.sender == null ? colorSent : message.sender.color;
+    let sender;
+    let thumbnail;
+    if (message.thread.participants.length > 1 && message.sender != null) {
+        sender = message.sender.getDisplayName();
+        thumbnail = message.sender.getAbbreviation();
     }
 
+    // Add message attachments
     if (message.attachments != null) {
         for (let i = 0; i < message.attachments.length; i++) {
-            let uiImage = $(
-                templateMessageImage(
-                    {
-                        id: message.id + "-" + i,
-                        color: message.sender == null ? colorSent : message.sender.color,
-                        sent: message.sender == null,
-                        mime: message.attachments[i].mime,
-                        image: message.attachments[i].data
-                    }
-                )
-            );
-            $("#messages").append(uiImage);
+            if (message.attachments[i].mime.startsWith("image")) {
+                let uiImage = $(
+                    templateMessage(
+                        {
+                            id: message.id + "-" + i,
+                            color: color,
+                            sent: message.sender == null,
+                            mime: message.attachments[i].mime,
+                            image: message.attachments[i].data,
+                            sender: sender,
+                            thumbnail: thumbnail
+                        }
+                    )
+                );
+                $("#messages").append(uiImage);
+            }
+            else
+                console.log("Currently unsupported mime: " + message.attachments[i].mime);
         }
     }
+
+    // Add message
     if (message.body != null) {
         let uiMessage = $(
             templateMessage(
                 {
                     id: message.id,
-                    color: message.sender == null ? colorSent : message.sender.color,
+                    color: color,
                     sent: message.sender == null,
-                    message: message.body
+                    message: message.body,
+                    sender: sender,
+                    thumbnail: thumbnail
                 }
             )
         );

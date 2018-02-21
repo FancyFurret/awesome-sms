@@ -4,7 +4,8 @@ $.when(
     $.getScript("js/api/model/contact.js"),
     $.getScript("js/api/model/message.js"),
     $.getScript("js/api/model/thread.js"),
-    $.getScript("js/api/util/util.js")
+    $.getScript("js/api/util/util.js"),
+    $.getScript("node_modules/libphonenumber-js/bundle/libphonenumber-js.min.js"),
 ).then(function () {
     console.log("AwesomeSMS api v0.1.0");
     $.holdReady(false);

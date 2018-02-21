@@ -5,7 +5,10 @@
     <link rel="stylesheet" href="css/style.css">
 
     <!-- Thanks: https://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined -->
-    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script>if (typeof module === 'object') {
+        window.module = module;
+        module = undefined;
+    }</script>
 
     <script src="node_modules/material-colors/dist/colors.js"></script>
     <script src="node_modules/handlebars/dist/handlebars.js"></script>
@@ -20,11 +23,14 @@
     <!-- Thanks: https://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined -->
     <script>if (window.module) module = window.module;</script>
 
-    <script id="template-thread-thumbnail-text" type="text/x-handlebars-template">
+    <script id="template-thumbnail" type="text/x-handlebars-template">
+        <div class="thumbnail {{type}}-thumbnail" style="background-color: {{color}}">
+            <p class="thumbnail-text {{type}}-thumbnail-text">{{thumbnail}}</p>
+        </div>
+    </script>
+    <script id="template-thread" type="text/x-handlebars-template">
         <div class="thread" id="thread-{{id}}">
-            <div class="thread-thumbnail" style="background-color: {{color}}">
-                <p class="thread-thumbnail-text">{{thumbnail}}</p>
-            </div>
+            {{> template-thumbnail type="thread"}}
             <div class="thread-information">
                 <p class="thread-contact-name">{{name}}</p>
                 <p class="thread-preview-text ellipsis">{{preview}}</p>
@@ -32,16 +38,28 @@
         </div>
     </script>
     <script id="template-message" type="text/x-handlebars-template">
-        <div class="message {{#if sent}}message-sent{{else}}message-received{{/if}}"
-             id="message-{{id}}"
-             style="background-color: {{color}}">
-            <p>{{message}}</p>
+        <div class="
+            message
+            {{#if image}}message-image{{/if}}
+            {{#if sent}}message-sent{{else}}message-received{{/if}}"
+             id="message-{{id}}">
+
+            {{#if thumbnail}}
+            {{> template-thumbnail type="message"}}
+            {{/if}}
+
+            <div class="message-text-sender">
+                {{#if image}}
+                <img src="data:{{mime}};base64,{{image}}"/>
+                {{#if sender}}<p class="group-message-sender">{{sender}}</p>{{/if}}
+                {{else}}
+                <div class="message-text" style="background-color: {{color}}">
+                    <p>{{message}}</p>
+                    {{#if sender}}<p class="group-message-sender">{{sender}}</p>{{/if}}
+                </div>
+                {{/if}}
+            </div>
         </div>
-    </script>
-    <script id="template-message-image" type="text/x-handlebars-template">
-        <img class="message message-image {{#if sent}}message-sent{{else}}message-received{{/if}}"
-             id="message-image-{{id}}"
-             src="data:{{mime}};base64,{{image}}" />
     </script>
 
     <title>Hello World!</title>

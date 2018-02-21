@@ -7,6 +7,8 @@
 
     --thread-height: 75px;
     --thread-thumbnail-size: 50px;
+
+    --message-thumbnail-size: 30px;
 }
 
 @font-face {
@@ -81,22 +83,28 @@ html, body{
     cursor: pointer;
 }
 
+.thumbnail {
+    border-radius: 100%;
+    float: left;
+}
+
+.thumbnail-text {
+    padding-top: 50%;
+    line-height: 0;
+    padding-bottom: 50%;
+    text-align: center;
+}
+
 .thread-thumbnail {
     height: var(--thread-thumbnail-size);
     width: var(--thread-thumbnail-size);
-    /*background-color: #2196F3;*/
-    border-radius: 100%;
-    float: left;
+    min-height: var(--thread-thumbnail-size);
+    min-width: var(--thread-thumbnail-size);
     margin-left: 15px;
 }
 
 .thread-thumbnail-text {
-    padding-top: 50%;
-    line-height: 0;
-    padding-bottom: 50%;
-
-    text-align: center;
-    font-weight: bold;
+    font-size: 1.5em;
 }
 
 .thread-information {
@@ -149,21 +157,43 @@ html, body{
 }
 
 .message {
-    padding: 6px;
-    margin: 6px;
-    border-radius: 12px;
-    max-width: 70%;
     clear: both;
+    max-width: 70%;
+    display: flex;
+    align-items: center;
 }
 
-.message-image {
-    padding: 0;
+.message-thumbnail {
+    height: var(--message-thumbnail-size);
+    width: var(--message-thumbnail-size);
+    min-height: var(--message-thumbnail-size);
+    min-width: var(--message-thumbnail-size);
 }
+
+.message-text-sender {
+    margin: 6px;
+}
+
+.message-text {
+    border-radius: 12px;
+    padding: 6px;
+}
+
+.group-message-sender {
+    padding-top: 7px;
+    font-size: .75em;
+    color: var(--thread-preview-color)
+}
+
 
 .message-image img {
     max-width: 100%;
     border-radius: 12px;
-    padding: 0;
+    display: block;
+}
+
+.message-image p {
+
 }
 
 .message-sent {

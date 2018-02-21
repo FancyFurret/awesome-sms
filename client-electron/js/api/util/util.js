@@ -1,3 +1,5 @@
+// import { parse, format } from 'libphonenumber-js';
+
 function randomColor() {
 
     let colors = [
@@ -31,4 +33,8 @@ function randomColor() {
 function pushSorted(array, item, compare) {
     array.push(item);
     array.sort(compare);
+}
+
+function formatPhone(phone) {
+    return libphonenumber.format(phone, 'National');
 }
