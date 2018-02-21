@@ -17,6 +17,14 @@ $(document).ready(function () {
         }
         console.log("Connected to server! Refreshing messages...");
 
+        $("#entry-bar-input").keyup((event) => {
+            if (event.keyCode === 13)
+                $("#entry-bar-send").click();
+        });
+        $("#entry-bar-send").click(() => {
+            awesomeSms.sendMessage(selectedThread, $("#entry-bar-input").val());
+        });
+
         awesomeSms.onMessageReceived = () => {
             $("#threads").empty();
             awesomeSms.getThreadsByDate().forEach((thread) => {

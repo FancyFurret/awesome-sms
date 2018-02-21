@@ -146,4 +146,13 @@ class AwesomeSms {
             this.onMessageReceived(newMessages, newThreads)
     }
 
+    sendMessage(threadId, body) {
+        this._socket.send(JSON.stringify([
+            "send_message",
+            {
+                "threadId": threadId,
+                "body": body
+            }
+        ]));
+    }
 }
