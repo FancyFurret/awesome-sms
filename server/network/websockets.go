@@ -11,6 +11,7 @@ import (
 type websocketServer struct {
 	db       *database.DB
 	upgrader *websocket.Upgrader
+	fcm      *fcmClient
 
 	// TODO: Allow for multiple users on one server
 	sockets []*websocket.Conn
@@ -23,6 +24,7 @@ func NewWebSocketServer(db *database.DB) *websocketServer {
 		CheckOrigin: func(r *http.Request) bool {
 			return true
 		}},
+		newFcmClient(),
 		make([]*websocket.Conn, 0)}
 }
 
@@ -64,6 +66,8 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 			server.getNewMessages(json, ws)
 		case "get_threads":
 			server.getThreads(json, ws)
+		case "send_message":
+			server.sendMessage(json, ws)
 		}
 	}
 }
@@ -86,4 +90,8 @@ func (server *websocketServer) getThreads(json map[string]interface{}, ws *webso
 	amount := int(json["amount"].(float64))
 	messages := server.db.MessageTable.GetThreads(amount)
 	ws.WriteJSON([2]interface{}{"new_messages", messages})
+}
+
+func (server *websocketServer) sendMessage(json map[string]interface{}, ws *websocket.Conn) {
+	server.fcm.sendMessage(json);
 }

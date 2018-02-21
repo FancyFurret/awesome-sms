@@ -9,6 +9,10 @@ type Json struct {
 	data map[string]interface{}
 }
 
+func NewJson(data map[string]interface{}) *Json {
+	return &Json{data}
+}
+
 func (json *Json) Set(value interface{}, path ...string) {
 	// Lazy initialization of data
 	if json.data == nil {
