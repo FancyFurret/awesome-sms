@@ -2,7 +2,6 @@ package network
 
 import (
 	"github.com/NaySoftware/go-fcm"
-	//"github.com/osum4est/awesome-sms-server/json"
 )
 
 type fcmClient struct {
@@ -16,8 +15,8 @@ func newFcmClient() *fcmClient {
 	return fcmClient
 }
 
-func (fcmClient *fcmClient) sendMessage(jsonBody map[string]interface{}) {
-	fcmClient.client.NewFcmMsgTo(myPhoneKey, jsonBody)
+func (fcmClient *fcmClient) sendMessage(json map[string]interface{}) {
+	fcmClient.client.NewFcmMsgTo(myPhoneKey, json)
 
 	status, err := fcmClient.client.Send()
 	if err != nil {

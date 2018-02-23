@@ -93,5 +93,6 @@ func (server *websocketServer) getThreads(json map[string]interface{}, ws *webso
 }
 
 func (server *websocketServer) sendMessage(json map[string]interface{}, ws *websocket.Conn) {
-	server.fcm.sendMessage(json);
+	json["event"] = "send_message"
+	server.fcm.sendMessage(json)
 }
