@@ -93,6 +93,7 @@ class AwesomeSms {
         messages.forEach((message) => {
             // Go through address, find sender, and add others to contacts if they don't exist
             let sender = undefined;
+            let addresses = [];
             let participants = [];
             message["addresses"].forEach((address) => {
                 // TODO: Dont make a new phone, point to existing one
@@ -110,6 +111,7 @@ class AwesomeSms {
                 if (address["type"] === _messageAddressTypeFrom)
                     sender = this._contacts.get(address["address"]);
 
+                addresses.push(address["address"]);
                 participants.push(this._contacts.get(address["address"]));
             });
 
@@ -117,6 +119,7 @@ class AwesomeSms {
             if (!this._threads.has(message["threadId"])) {
                 this._threads.set(message["threadId"], new Thread(
                     message["threadId"],
+                    addresses,
                     participants,
                     []
                 ));
@@ -151,6 +154,7 @@ class AwesomeSms {
             "send_message",
             {
                 "threadId": threadId,
+                "addresses": this.getThread(threadId).addresses,
                 "body": body
             }
         ]));

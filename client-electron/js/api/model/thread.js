@@ -1,7 +1,8 @@
 class Thread {
-    constructor(id, participants, messages) {
+    constructor(id, addresses, participants, messages) {
         this.id = id;
         // DOES NOT INCLUDE YOURSELF
+        this.addresses = addresses;
         this.participants = participants;
         // Always sorted with 0 being oldest
         this.messages = messages;

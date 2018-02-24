@@ -22,7 +22,8 @@ $(document).ready(function () {
                 $("#entry-bar-send").click();
         });
         $("#entry-bar-send").click(() => {
-            awesomeSms.sendMessage(selectedThread, $("#entry-bar-input").val());
+            awesomeSms.sendMessage(getThreadIdFromThread(selectedThread), $("#entry-bar-input").val());
+            $("#entry-bar-input").val("")
         });
 
         awesomeSms.onMessageReceived = () => {
@@ -48,8 +49,12 @@ $(document).ready(function () {
 });
 
 function refreshThreadMessages() {
-    let threadId = parseInt(selectedThread.attr("id").replace("thread-", ""));
+    let threadId = getThreadIdFromThread(selectedThread);
     $("#messages").empty();
     for (let i = 0; i < awesomeSms.getThread(threadId).messages.length; i++)
         appendMessage(awesomeSms.getThread(threadId).messages[i]);
+}
+
+function getThreadIdFromThread(thread) {
+    return parseInt(thread.attr("id").replace("thread-", ""));
 }
