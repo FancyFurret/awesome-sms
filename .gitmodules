@@ -1,0 +1,3 @@
+[submodule "submodules/android-smsmms"]
+	path = submodules/android-smsmms
+	url = https://github.com/osum4est/android-smsmms
