@@ -73,7 +73,7 @@ public class TextObserver extends AutoContentObserver {
 
         this.listener = listener;
 
-        TelephonyManager t = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager t = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         myPhoneNumber = t.getLine1Number();
         if (myPhoneNumber == null || myPhoneNumber.isEmpty() || myPhoneNumber.contains("?"))
             Log.e(AwesomeSMS.TAG, "Unable to get your phone number.");

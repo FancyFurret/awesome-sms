@@ -24,8 +24,8 @@ import org.json.JSONObject;
  */
 public class Messenger implements ITextListener, IContactListener {
 
-     private static final String IP = "http://192.168.1.79:11150"; // TODO: Move to settings
-//    private static final String IP = "http://192.168.42.205:11150"; // TODO: Move to settings
+    private static final String IP = "http://192.168.1.79:11150"; // TODO: Move to settings
+    //    private static final String IP = "http://192.168.42.205:11150"; // TODO: Move to settings
     private static final String INSERT_MESSAGE = "/insert_message";
     private static final String UPDATE_CONTACT = "/update_contact";
     private static final String DELETE_CONTACT = "/delete_contact";

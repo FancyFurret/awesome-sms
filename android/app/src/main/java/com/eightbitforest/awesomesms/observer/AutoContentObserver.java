@@ -31,7 +31,7 @@ public abstract class AutoContentObserver extends ContentObserver {
      * register().
      *
      * @param trackingDatabase The database to track already changed rows.
-     * @param context         The context of the app.
+     * @param context          The context of the app.
      * @param contentResolver  Android's content resolver to get content providers.
      * @param observeUri       The uri that this ContentObserver should observe.
      */

@@ -19,7 +19,7 @@ public class Util {
      * If a country code is not supplied, we add the default country code used by this phone.
      *
      * @param context Context of the app.
-     * @param phone The phone number to normalize.
+     * @param phone   The phone number to normalize.
      * @return Returns a normalized version of the provided phone number.
      */
     public static String normalizePhone(Context context, String phone) {
