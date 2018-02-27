@@ -43,7 +43,7 @@ SELECT
   attachment.data
 FROM message
   -- Select ? latest unique messages
-  NATURAL JOIN (SELECT DISTINCT message.id
+  NATURAL JOIN (SELECT DISTINCT message.id, message.protocol
                 FROM message
                 ORDER BY message.date
                   DESC
