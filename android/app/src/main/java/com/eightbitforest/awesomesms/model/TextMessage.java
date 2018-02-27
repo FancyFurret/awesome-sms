@@ -135,7 +135,7 @@ public class TextMessage {
     public static class Attachment {
         private int id;
         private String mime;
-        private byte[] data;
+        private String data;
 
         /**
          * Constructs an Attachment.
@@ -147,7 +147,7 @@ public class TextMessage {
         public Attachment(int id, String mime, byte[] data) {
             this.id = id;
             this.mime = mime;
-            this.data = Base64.encode(data, Base64.DEFAULT);
+            this.data = Base64.encodeToString(data, Base64.DEFAULT);
         }
 
         public int getId() {
@@ -158,7 +158,7 @@ public class TextMessage {
             return mime;
         }
 
-        public byte[] getData() {
+        public String getData() {
             return data;
         }
 

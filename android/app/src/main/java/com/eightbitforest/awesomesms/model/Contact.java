@@ -16,7 +16,7 @@ public class Contact {
     private int id;
     private String name;
     private ArrayList<Phone> phones;
-    private byte[] thumbnail;
+    private String thumbnail;
 
     /**
      * Constructs a Contact.
@@ -31,7 +31,7 @@ public class Contact {
         this.name = name;
         this.phones = phones;
         if (thumbnail != null)
-            this.thumbnail = Base64.encode(thumbnail, Base64.DEFAULT);
+            this.thumbnail = Base64.encodeToString(thumbnail, Base64.DEFAULT);
     }
 
     @Override
@@ -40,7 +40,6 @@ public class Contact {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", phones=" + phones +
-                ", thumbnail=" + Arrays.toString(thumbnail) +
                 '}';
     }
 

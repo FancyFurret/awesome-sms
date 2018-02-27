@@ -14,6 +14,9 @@ import com.eightbitforest.awesomesms.R;
  */
 public class Util {
 
+    // TODO: Deal with email addresses
+    // TODO: Deal with weird broken numbers somehow
+
     /**
      * Normalizes a phone number by removing everything but numbers except for a leading +.
      * If a country code is not supplied, we add the default country code used by this phone.
@@ -23,7 +26,10 @@ public class Util {
      * @return Returns a normalized version of the provided phone number.
      */
     public static String normalizePhone(Context context, String phone) {
-        boolean hasCountryCode = phone.startsWith("+");
+        // WARNING: No idea if this is correct. With some testing, I found that MMS to US numbers
+        // store addresses with just a 1 in the front, no +. International numbers include the +.
+        // Don't know if this only works in the US.
+        boolean hasCountryCode = phone.startsWith("+") || phone.startsWith("1");
         String strippedPhone = phone.replaceAll("[^0-9]", "");
 
         if (hasCountryCode)

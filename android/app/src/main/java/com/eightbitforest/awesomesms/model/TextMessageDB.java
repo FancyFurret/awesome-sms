@@ -25,6 +25,8 @@ public class TextMessageDB {
     public static final byte ERROR_UNKNOWN_ADDRESS_TYPE = 5;
     /** When a part of the attachment could not be loaded. */
     public static final byte ERROR_MISSING_PART_FILE = 6;
+    /** When an SMS address is invalid. */
+    public static final byte ERROR_INVALID_ADDRESS= 7;
 
     static final String SQL_CREATE_TEXT_MESSAGES =
             "CREATE TABLE " + TABLE_NAME + " (" +
