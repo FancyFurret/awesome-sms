@@ -26,6 +26,7 @@ class AwesomeSms {
         this._contacts = new Map();
 
         this.onMessageReceived = undefined;
+        this.onContactReceived = undefined;
     }
 
     connectToServer(ip, callback) {
@@ -48,6 +49,10 @@ class AwesomeSms {
             switch (data[0]) {
                 case "new_messages":
                     this._handleNewMessages(data[1]);
+                    break;
+                case "new_contacts":
+                    this._handleNewContacts(data[1]);
+                    break;
             }
         };
     }
@@ -66,6 +71,12 @@ class AwesomeSms {
         //         "amount": 100
         //     }
         // ]));
+    }
+
+    refreshContacts() {
+        this._socket.send(JSON.stringify([
+            "get_contacts", {}
+        ]));
     }
 
     getMessage(id) {
@@ -93,33 +104,30 @@ class AwesomeSms {
         messages.forEach((message) => {
             // Go through address, find sender, and add others to contacts if they don't exist
             let sender = undefined;
-            let addresses = [];
             let participants = [];
             message["addresses"].forEach((address) => {
-                // TODO: Dont make a new phone, point to existing one
-                // TODO: Other stuff that i need to think about
                 if (!this._contacts.has(address["address"])) {
                     this._contacts.set(address["address"], new Contact(
+                        this,
                         null,
                         null,
-                        [new ContactPhone(address["address"], address["type"])],
+                        [new ContactPhone(this, address["address"], address["type"])],
                         null,
                         randomColor()
                     ))
                 }
 
                 if (address["type"] === _messageAddressTypeFrom)
-                    sender = this._contacts.get(address["address"]);
+                    sender = address["address"];
 
-                addresses.push(address["address"]);
-                participants.push(this._contacts.get(address["address"]));
+                participants.push(address["address"]);
             });
 
             // Add thread if it doesn't exist
             if (!this._threads.has(message["threadId"])) {
                 this._threads.set(message["threadId"], new Thread(
+                    this,
                     message["threadId"],
-                    addresses,
                     participants,
                     []
                 ));
@@ -129,6 +137,7 @@ class AwesomeSms {
 
             // Add messages
             this._messages.set(message["id"], new Message(
+                this,
                 message["id"],
                 message["date"],
                 message["protocol"],
@@ -148,6 +157,34 @@ class AwesomeSms {
         if (this.onMessageReceived !== undefined)
             this.onMessageReceived(newMessages, newThreads)
     }
+
+    _handleNewContacts(contacts) {
+        contacts.forEach((contact) => {
+            let phones = [];
+
+            // Make contact
+            let newContact = new Contact(
+                this,
+                contact["id"],
+                contact["name"],
+                phones,
+                contact["thumbnail"],
+                randomColor()
+            );
+
+            // Get contact phones
+            contact["phones"].forEach((phone) => {
+                phones.push(new ContactPhone(this, phone["number"], phone["type"]));
+
+                // Insert contact
+                this._contacts.set(phone["number"], newContact)
+            });
+        });
+
+        if (this.onContactReceived !== undefined)
+            this.onContactReceived()
+    }
+
 
     sendMessage(threadId, body) {
         this._socket.send(JSON.stringify([

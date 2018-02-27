@@ -1,5 +1,6 @@
 class Contact {
-    constructor(id, name, phones, thumbnail, color) {
+    constructor(awesomeSms, id, name, phones, thumbnail, color) {
+        this.awesomeSms = awesomeSms;
         this.id = id;
         this.name = name;
         this.phones = phones;
@@ -28,7 +29,8 @@ class Contact {
 }
 
 class ContactPhone {
-    constructor(number, type) {
+    constructor(awesomeSms, number, type) {
+        this.awesomeSms = awesomeSms;
         this.number = number;
         this.type = type;
     }

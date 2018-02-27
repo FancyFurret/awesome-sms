@@ -185,15 +185,14 @@ html, body{
     color: var(--thread-preview-color)
 }
 
-
 .message-image img {
     max-width: 100%;
     border-radius: 12px;
     display: block;
 }
 
-.message-image p {
-
+.message-pending {
+    color: var(--thread-preview-color)
 }
 
 .message-sent {

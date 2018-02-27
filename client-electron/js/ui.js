@@ -21,15 +21,15 @@ function initUi() {
 }
 
 function prependThread(thread) {
-    let abbr = thread.participants.length > 1 ? "#" : thread.participants[0].getAbbreviation();
+    let abbr = thread.participants.length > 1 ? "#" : thread.getParticipantContact(0).getAbbreviation();
     let name = "";
     for (let i = 0; i < thread.participants.length; i++) {
         if (i > 0) // More than 1 participant
             abbr = "#";
         else
-            abbr = thread.participants[i].getAbbreviation();
+            abbr = thread.getParticipantContact(i).getAbbreviation();
 
-        name += thread.participants[i].getDisplayName() + ", ";
+        name += thread.getParticipantContact(i).getDisplayName() + ", ";
     }
     name = name.slice(0, -2);
 
@@ -38,7 +38,7 @@ function prependThread(thread) {
             {
                 id: thread.id,
                 thumbnail: abbr,
-                color: thread.participants[0].color,
+                color: thread.getParticipantContact(0).color,
                 name: name,
                 preview: thread.getMostRecentMessage().body
             }
@@ -51,12 +51,12 @@ function prependThread(thread) {
 }
 
 function appendMessage(message) {
-    let color = message.sender == null ? colorSent : message.sender.color;
+    let color = message.getSenderContact() == null ? colorSent : message.getSenderContact().color;
     let sender;
     let thumbnail;
     if (message.thread.participants.length > 1 && message.sender != null) {
-        sender = message.sender.getDisplayName();
-        thumbnail = message.sender.getAbbreviation();
+        sender = message.getSenderContact().getDisplayName();
+        thumbnail = message.getSenderContact().getAbbreviation();
     }
 
     // Add message attachments

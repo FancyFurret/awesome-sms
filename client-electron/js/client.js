@@ -26,29 +26,41 @@ $(document).ready(function () {
             $("#entry-bar-input").val("")
         });
 
+        awesomeSms.onContactReceived = () => {
+            refreshThreads();
+        };
+
         awesomeSms.onMessageReceived = () => {
-            $("#threads").empty();
-            awesomeSms.getThreadsByDate().forEach((thread) => {
-                let uiThread = prependThread(thread);
-                if (uiThread)
-                    uiThread.click(function() {
-                        selectedThread = $(this);
-                        refreshThreadMessages();
-                    });
-            });
-
-            if (selectedThread === undefined) {
-                selectedThread = $(".thread").first();
-            }
-
-            refreshThreadMessages();
+            refreshThreads();
+            awesomeSms.refreshContacts();
         };
 
         awesomeSms.refreshMessages();
     });
 });
 
+function refreshThreads() {
+    $("#threads").empty();
+    awesomeSms.getThreadsByDate().forEach((thread) => {
+        let uiThread = prependThread(thread);
+        if (uiThread)
+            uiThread.click(function () {
+                selectedThread = $(this);
+                refreshThreadMessages();
+            });
+    });
+
+    if (selectedThread === undefined) {
+        selectedThread = $(".thread").first();
+    }
+
+    refreshThreadMessages();
+}
+
 function refreshThreadMessages() {
+    if (selectedThread === undefined || selectedThread.length === 0)
+        return;
+
     let threadId = getThreadIdFromThread(selectedThread);
     $("#messages").empty();
     for (let i = 0; i < awesomeSms.getThread(threadId).messages.length; i++)

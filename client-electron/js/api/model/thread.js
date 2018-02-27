@@ -1,8 +1,8 @@
 class Thread {
-    constructor(id, addresses, participants, messages) {
+    constructor(awesomeSms, id, participants, messages) {
+        this.awesomeSms = awesomeSms;
         this.id = id;
         // DOES NOT INCLUDE YOURSELF
-        this.addresses = addresses;
         this.participants = participants;
         // Always sorted with 0 being oldest
         this.messages = messages;
@@ -18,5 +18,9 @@ class Thread {
 
     getMostRecentMessage() {
         return this.messages[this.messages.length - 1];
+    }
+
+    getParticipantContact(i) {
+        return awesomeSms._contacts.get(this.participants[i]);
     }
 }
