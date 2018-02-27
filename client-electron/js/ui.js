@@ -72,7 +72,8 @@ function appendMessage(message) {
                             mime: message.attachments[i].mime,
                             image: message.attachments[i].data,
                             sender: sender,
-                            thumbnail: thumbnail
+                            thumbnail: thumbnail,
+                            pending: message.pending
                         }
                     )
                 );
@@ -93,7 +94,8 @@ function appendMessage(message) {
                     sent: message.sender == null,
                     message: message.body,
                     sender: sender,
-                    thumbnail: thumbnail
+                    thumbnail: thumbnail,
+                    pending: message.pending
                 }
             )
         );

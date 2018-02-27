@@ -54,8 +54,9 @@
                 {{#if sender}}<p class="group-message-sender">{{sender}}</p>{{/if}}
                 {{else}}
                 <div class="message-text" style="background-color: {{color}}">
-                    <p>{{message}}</p>
+                    <p class="message-text-body">{{message}}</p>
                     {{#if sender}}<p class="group-message-sender">{{sender}}</p>{{/if}}
+                    {{#if pending}}<p class="group-message-sender">Sending...</p>{{/if}}
                 </div>
                 {{/if}}
             </div>

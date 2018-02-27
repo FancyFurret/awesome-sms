@@ -15,6 +15,9 @@ const _messageAddressTypeTo = 0;
 const _messageAddressTypeFrom = 1;
 const _messageAddressTypeCC = 2;
 
+const _messageProtocolSMS = 0;
+const _messageProtocolMMS = 1;
+
 // TODO: Move to private helper classes?
 class AwesomeSms {
 
@@ -24,6 +27,8 @@ class AwesomeSms {
         this._messages = new Map();
         this._threads = new Map();
         this._contacts = new Map();
+
+        this._pendingMessages = [];
 
         this.onMessageReceived = undefined;
         this.onContactReceived = undefined;
@@ -147,9 +152,23 @@ class AwesomeSms {
                 message["attachments"]
             ));
 
+            // Add message to thread
             this._threads.get(message["threadId"]).insertMessage(
                 this._messages.get(message["id"])
             );
+
+            // Remove message from pending if it was pending
+            let i = 0;
+            this._pendingMessages.forEach((pendingMessage) => {
+                if (pendingMessage.thread.id === message["threadId"] &&
+                    pendingMessage.body === message["body"]) {
+                    this._pendingMessages.splice(i, 1);
+                    this._threads.get(message["threadId"]).removeMessage(pendingMessage);
+
+                    return;
+                }
+                i++;
+            });
 
             newMessages.push(this._messages.get(message["id"]))
         });
@@ -187,6 +206,20 @@ class AwesomeSms {
 
 
     sendMessage(threadId, body) {
+        let message = new Message(
+            this,
+            -1,
+            Math.round((new Date()).getTime() / 1000),
+            -1,
+            this.getThread(threadId),
+            null,
+            body,
+            [],
+            true
+        );
+        this._pendingMessages.push(message);
+        this.getThread(threadId).insertMessage(message);
+
         this._socket.send(JSON.stringify([
             "send_message",
             {
@@ -195,5 +228,7 @@ class AwesomeSms {
                 "body": body
             }
         ]));
+
+        this.onMessageReceived();
     }
 }

@@ -13,7 +13,11 @@ class Thread {
      * @param message The message to insert.
      */
     insertMessage(message) {
-        pushSorted(this.messages, message, (a, b) => a.id - b.id);
+        pushSorted(this.messages, message, (a, b) => a.date - b.date);
+    }
+
+    removeMessage(message) {
+        this.messages.splice(this.messages.indexOf(message), 1);
     }
 
     getMostRecentMessage() {

@@ -3,7 +3,7 @@
 :root {
     --background-color: #323232;
     --foreground-color: #e2e2e2;
-    --thread-preview-color: #bbbbbb;
+    --thread-preview-color: #999999;
 
     --thread-height: 75px;
     --thread-thumbnail-size: 50px;
@@ -189,10 +189,6 @@ html, body{
     max-width: 100%;
     border-radius: 12px;
     display: block;
-}
-
-.message-pending {
-    color: var(--thread-preview-color)
 }
 
 .message-sent {
