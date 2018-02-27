@@ -44,7 +44,10 @@ function prependThread(thread) {
             }
         ));
     $("#threads").prepend(uiThread);
-    uiThread.dotdotdot({
+    uiThread.find(".thread-contact-name").dotdotdot({
+        truncate: "letter"
+    });
+    uiThread.find(".thread-preview-text").dotdotdot({
         truncate: "letter"
     });
     return uiThread;

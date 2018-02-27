@@ -119,13 +119,16 @@ html, body{
 }
 
 .thread-contact-name {
-    margin: 5px
+    margin: 5px;
+    max-height: 30px;
 }
 
 .thread-preview-text {
     margin: 5px;
+    max-height: 20px;
+
     font-size: .85em;
-    color: var(--thread-preview-color)
+    color: var(--thread-preview-color);
 }
 
 #conversation-container {
