@@ -66,6 +66,8 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 			server.getNewMessages(json, ws)
 		case "get_threads":
 			server.getThreads(json, ws)
+		case "get_contacts":
+			server.getContacts(json, ws)
 		case "send_message":
 			server.sendMessage(json, ws)
 		}
@@ -75,6 +77,18 @@ func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Requ
 func (server *websocketServer) broadcastMessages(messages ...*model.MessageJson) {
 	for _, ws := range server.sockets {
 		ws.WriteJSON([2]interface{}{"new_messages", messages})
+	}
+}
+
+func (server *websocketServer) broadcastContacts(contacts ...*model.ContactJson) {
+	for _, ws := range server.sockets {
+		ws.WriteJSON([2]interface{}{"new_contacts", contacts})
+	}
+}
+
+func (server *websocketServer) broadcastDeletedContacts(contacts ...*model.ContactJson) {
+	for _, ws := range server.sockets {
+		ws.WriteJSON([2]interface{}{"deleted_contacts", contacts})
 	}
 }
 
@@ -90,6 +104,11 @@ func (server *websocketServer) getThreads(json map[string]interface{}, ws *webso
 	amount := int(json["amount"].(float64))
 	messages := server.db.MessageTable.GetThreads(amount)
 	ws.WriteJSON([2]interface{}{"new_messages", messages})
+}
+
+func (server *websocketServer) getContacts(json map[string]interface{}, ws *websocket.Conn) {
+	contacts := server.db.ContactTable.GetContacts()
+	ws.WriteJSON([2]interface{}{"new_contacts", contacts})
 }
 
 func (server *websocketServer) sendMessage(json map[string]interface{}, ws *websocket.Conn) {

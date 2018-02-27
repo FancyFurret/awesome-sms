@@ -19,6 +19,18 @@ const (
 		contactColName + " text NOT NULL," +
 		contactColThumbnail + " blob" +
 		");"
+
+	contactGetContactsSql = `
+SELECT
+contact.id,
+contact.name,
+contact.thumbnail,
+contact_phone.number,
+contact_phone.type
+FROM contact
+  JOIN contact_phone ON contact.id = contact_phone.contact_id;
+
+`
 )
 
 type contactTable struct {
@@ -66,4 +78,55 @@ func (table *contactTable) Delete(contacts ...*model.ContactJson) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (table *contactTable) GetContacts() *[]model.ContactJson {
+	rows, err := table.sqlDb.Query(contactGetContactsSql)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	// TODO: Thumbnails take a while to send. Send over url instead?
+	contacts := make([]model.ContactJson, 0)
+	lastId := -1
+
+	for rows.Next() {
+		contact := &model.ContactJson{}
+
+		var (
+			number     string
+			numberType int
+		)
+
+		err := rows.Scan(
+			&contact.Id,
+			&contact.Name,
+			&contact.Thumbnail,
+			&number,
+			&numberType)
+		if err != nil {
+			panic(err)
+		}
+
+		// Get the already created contact if this contact has already been created
+		if lastId == contact.Id {
+			contact = &contacts[len(contacts)-1]
+		}
+
+		// Add phone
+		contact.Phones = append(contact.Phones,
+			model.ContactPhoneJson{
+				Number: number,
+				Type:   numberType})
+
+		// Add the contact to the array if it hasn't been added yet
+		if lastId != contact.Id {
+			contacts = append(contacts, *contact)
+		}
+
+		lastId = contact.Id
+	}
+
+	return &contacts
 }
