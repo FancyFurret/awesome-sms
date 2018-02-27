@@ -5,6 +5,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osum4est/awesome-sms-server/model"
 	"strings"
+	"encoding/base64"
 )
 
 const (
@@ -221,7 +222,7 @@ func (table *messageTable) getMessagesFromRows(rows *sql.Rows) *[]model.MessageJ
 				model.MessageAttachmentJson{
 					Id:   int(attachmentId.Int64),
 					Mime: mime.String,
-					Data: data})
+					Data: base64.StdEncoding.EncodeToString(data)})
 		}
 
 		// Add the message to the array if it hasn't been added yet

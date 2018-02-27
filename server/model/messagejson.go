@@ -24,5 +24,5 @@ type MessageAddressJson struct {
 type MessageAttachmentJson struct {
 	Id   int `json:"id"`
 	Mime string `json:"mime"`
-	Data []byte `json:"data"`
+	Data string `json:"data"`
 }

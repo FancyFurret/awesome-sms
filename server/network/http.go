@@ -91,6 +91,8 @@ func (server *httpServer) updateContact(w http.ResponseWriter, r *http.Request) 
 		server.db.ContactPhoneTable.InsertFromContacts(&contact)
 
 		server.sendSuccess(w)
+
+		server.websockets.broadcastContacts(&contact)
 	}
 }
 
@@ -105,6 +107,8 @@ func (server *httpServer) updateContacts(w http.ResponseWriter, r *http.Request)
 		server.db.ContactPhoneTable.InsertFromContacts(contacts...)
 
 		server.sendSuccess(w)
+
+		server.websockets.broadcastContacts(contacts...)
 	}
 }
 
@@ -118,6 +122,8 @@ func (server *httpServer) deleteContact(w http.ResponseWriter, r *http.Request) 
 		server.db.ContactPhoneTable.DeleteFromContacts(&contact)
 
 		server.sendSuccess(w)
+
+		server.websockets.broadcastDeletedContacts(&contact)
 	}
 }
 
@@ -131,6 +137,8 @@ func (server *httpServer) deleteContacts(w http.ResponseWriter, r *http.Request)
 		server.db.ContactPhoneTable.DeleteFromContacts(contacts...)
 
 		server.sendSuccess(w)
+
+		server.websockets.broadcastDeletedContacts(contacts...)
 	}
 }
 

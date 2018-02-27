@@ -5,6 +5,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osum4est/awesome-sms-server/model"
 	"strings"
+	"encoding/base64"
 )
 
 const (
@@ -38,9 +39,20 @@ func (table *attachmentTable) InsertFromMessages(messages ...*model.MessageJson)
 	// Compile all attachments into 1 query
 	for _, message := range messages {
 		for _, attachment := range message.Attachments {
+
+			byteData, err := base64.StdEncoding.DecodeString(attachment.Data)
+			if err != nil {
+				panic(err)
+			}
+
 			// Add to stmt and data
 			stmt += "(?,?,?,?),"
-			data = append(data, attachment.Id, message.Id, attachment.Mime, attachment.Data)
+			data = append(
+				data,
+				attachment.Id,
+				message.Id,
+				attachment.Mime,
+				byteData)
 		}
 	}
 	stmt = strings.TrimRight(stmt, ",")
