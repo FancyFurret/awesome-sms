@@ -191,7 +191,7 @@ class AwesomeSms {
             "send_message",
             {
                 "threadId": threadId,
-                "addresses": this.getThread(threadId).addresses,
+                "addresses": this.getThread(threadId).participants,
                 "body": body
             }
         ]));
