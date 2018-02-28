@@ -15,6 +15,10 @@ type websocketServer struct {
 
 	// TODO: Allow for multiple users on one server
 	sockets []*websocket.Conn
+
+	// TODO: Store these somewhere else
+	currentPendingAttachmentsId int
+	pendingAttachments          map[int]*model.MessageAttachmentJson
 }
 
 func NewWebSocketServer(db *database.DB) *websocketServer {
@@ -25,7 +29,9 @@ func NewWebSocketServer(db *database.DB) *websocketServer {
 			return true
 		}},
 		newFcmClient(),
-		make([]*websocket.Conn, 0)}
+		make([]*websocket.Conn, 0),
+		0,
+		make(map[int]*model.MessageAttachmentJson, 0)}
 }
 
 func (server *websocketServer) newConnection(w http.ResponseWriter, r *http.Request) {
@@ -112,6 +118,24 @@ func (server *websocketServer) getContacts(json map[string]interface{}, ws *webs
 }
 
 func (server *websocketServer) sendMessage(json map[string]interface{}, ws *websocket.Conn) {
+	// Save attachments so they can be accessed with a future http request, since they are
+	// too big to send over fcm
+	attachments := json["attachments"].([]interface{})
+	jsonAttachments := make([]int, len(attachments))
+	json["attachments"] = jsonAttachments
+	for i, attachment := range attachments {
+		attachmentMap := attachment.(map[string]interface{})
+		pendingAttachment :=
+			&model.MessageAttachmentJson{
+				Id:   -1,
+				Mime: attachmentMap["mime"].(string),
+				Data: attachmentMap["data"].(string)}
+		server.pendingAttachments[server.currentPendingAttachmentsId] = pendingAttachment
+		jsonAttachments[i] = server.currentPendingAttachmentsId
+
+		server.currentPendingAttachmentsId++
+	}
+
 	json["event"] = "send_message"
 	server.fcm.sendMessage(json)
 }

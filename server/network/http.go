@@ -6,6 +6,7 @@ import(
 	"github.com/osum4est/awesome-sms-server/model"
 	"github.com/osum4est/awesome-sms-server/json"
 	"fmt"
+	"strconv"
 )
 
 const(
@@ -34,6 +35,7 @@ func (server *httpServer) Start() {
 	http.HandleFunc("/update_contacts", server.updateContacts)
 	http.HandleFunc("/delete_contact", server.deleteContact)
 	http.HandleFunc("/delete_contacts", server.deleteContacts)
+	http.HandleFunc("/get_attachments", server.getAttachments)
 
 	// WebSockets
 	http.HandleFunc("/ws", server.websockets.newConnection)
@@ -139,6 +141,43 @@ func (server *httpServer) deleteContacts(w http.ResponseWriter, r *http.Request)
 		server.sendSuccess(w)
 
 		server.websockets.broadcastDeletedContacts(contacts...)
+	}
+}
+
+func (server *httpServer) getAttachments(w http.ResponseWriter, r *http.Request) {
+	if server.ensureMethod(w, r, GET) {
+		//var params map[string]interface{}
+		//json.Decode(&r.Body, &params)
+
+		//attachmentIds := params["attachments"].([]int)
+		//attachmentIds := r.URL.Query().Get("attachments")
+
+		attachments := make([]*map[string]string, len(r.URL.Query()["attachments"]))
+		for i, attachmentId := range r.URL.Query()["attachments"] {
+			id, err := strconv.Atoi(attachmentId)
+			if err != nil {
+				server.sendError(w, "Attachment id is not an integer")
+				return
+			}
+
+			if attachment, ok := server.websockets.pendingAttachments[id]; ok {
+				pendingAttachment := attachment
+				attachment := make(map[string]string)
+				attachment["mime"] = pendingAttachment.Mime
+				attachment["data"] = pendingAttachment.Data
+				attachments[i] = &attachment
+
+				delete(server.websockets.pendingAttachments, id)
+			} else {
+				server.sendError(w, "Could not find attachment " + strconv.Itoa(id))
+				return
+			}
+		}
+
+		var response json.Json
+		response.Set("Success", "status")
+		response.Set(attachments, "attachments")
+		server.sendResponseJson(w, response)
 	}
 }
 
