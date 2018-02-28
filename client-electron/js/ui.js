@@ -4,6 +4,7 @@
 
 let templateThread;
 let templateMessage;
+let templateEntryBarImage;
 // let templateMessageImage;
 
 const colorSent = materialColors.grey["800"];
@@ -18,6 +19,9 @@ function initUi() {
 
     let templateMessageSource = $("#template-message").html();
     templateMessage = Handlebars.compile(templateMessageSource);
+
+    let templateEntryBarImageSource = $("#template-entry-bar-image").html();
+    templateEntryBarImage = Handlebars.compile(templateEntryBarImageSource);
 }
 
 function prependThread(thread) {
@@ -88,7 +92,7 @@ function appendMessage(message) {
     }
 
     // Add message
-    if (message.body != null) {
+    if (message.body) {
         let uiMessage = $(
             templateMessage(
                 {
@@ -105,4 +109,18 @@ function appendMessage(message) {
         $("#messages").append(uiMessage);
     }
     return true;
+}
+
+function appendEntryBarImage(id, image) {
+    let uiEntryBarImage = $(
+        templateEntryBarImage(
+            {
+                id: id,
+                image: image
+            }
+        )
+    );
+    $("#entry-bar-images").append(uiEntryBarImage);
+
+    return uiEntryBarImage;
 }

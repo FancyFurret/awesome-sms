@@ -205,7 +205,7 @@ class AwesomeSms {
     }
 
 
-    sendMessage(threadId, body) {
+    sendMessage(threadId, body, attachments) {
         let message = new Message(
             this,
             -1,
@@ -214,7 +214,7 @@ class AwesomeSms {
             this.getThread(threadId),
             null,
             body,
-            [],
+            attachments,
             true
         );
         this._pendingMessages.push(message);

@@ -52,6 +52,7 @@
                 {{#if image}}
                 <img src="data:{{mime}};base64,{{image}}"/>
                 {{#if sender}}<p class="group-message-sender">{{sender}}</p>{{/if}}
+                {{#if pending}}<p class="group-message-sender">Sending...</p>{{/if}}
                 {{else}}
                 <div class="message-text" style="background-color: {{color}}">
                     <p class="message-text-body">{{message}}</p>
@@ -60,6 +61,12 @@
                 </div>
                 {{/if}}
             </div>
+        </div>
+    </script>
+    <script id="template-entry-bar-image" type="text/x-handlebars-template">
+        <div class="entry-bar-image" id="entry-bar-image-{{id}}">
+            <img src="{{image}}"/>
+            <i class="material-icons entry-bar-image-delete">remove_circle</i>
         </div>
     </script>
 
@@ -79,9 +86,17 @@
                 <!-- Messages will be loaded here by js -->
             </div>
         </div>
+        <div id="entry-bar-images">
+            <!-- Selected attachments will by loaded here by js -->
+        </div>
         <div id="entry-bar">
+            <button id="entry-bar-attachment" class="button">
+                <i class="material-icons">add_box</i>
+            </button>
+            <input id="entry-bar-attachment-input" type="file" name="name" style="display: none;" accept="image/*"
+                   multiple/>
             <input id="entry-bar-input" type="text" placeholder="Enter a message...">
-            <button id="entry-bar-send">
+            <button id="entry-bar-send" class="button">
                 <i class="material-icons">send</i>
             </button>
         </div>

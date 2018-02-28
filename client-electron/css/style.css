@@ -202,6 +202,35 @@ html, body{
     float: left;
 }
 
+#entry-bar-images {
+    padding: 6px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.entry-bar-image {
+    width: 150px;
+    padding: 6px;
+    position: relative;
+}
+
+.entry-bar-image img {
+    max-width: 100%;
+    border-radius: 12px;
+    float: right;
+    opacity: .9;
+}
+
+.entry-bar-image-delete {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+.entry-bar-image-delete:hover {
+    cursor: pointer;
+}
+
 #entry-bar {
     margin: 6px;
     display: flex;
@@ -221,11 +250,23 @@ html, body{
     outline: none;
 }
 
-#entry-bar-send {
+.button:focus {
+    outline: none;
+}
+
+.button:hover {
+    cursor: pointer;
+}
+
+.button {
     margin-left: 5px;
     background-color: transparent;
     color: var(--foreground-color);
     border: none;
+}
+
+.button i {
+    line-height: 1.2em;
 }
 
 #entry-bar-send:focus {
