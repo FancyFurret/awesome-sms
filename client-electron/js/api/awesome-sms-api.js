@@ -225,7 +225,8 @@ class AwesomeSms {
             {
                 "threadId": threadId,
                 "addresses": this.getThread(threadId).participants,
-                "body": body
+                "body": body,
+                "attachments": attachments
             }
         ]));
 
