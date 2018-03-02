@@ -25,13 +25,16 @@ function initUi() {
 }
 
 function prependThread(thread) {
-    let abbr = thread.participants.length > 1 ? "#" : thread.getParticipantContact(0).getAbbreviation();
+    let thumbnailText = thread.participants.length > 1 ? "#" : thread.getParticipantContact(0).getAbbreviation();
+    let thumbnailImage;
     let name = "";
     for (let i = 0; i < thread.participants.length; i++) {
         if (i > 0) // More than 1 participant
-            abbr = "#";
+            thumbnailText = i + 1;
+        else if (thread.getParticipantContact(i).thumbnail !== undefined)
+            thumbnailImage = thread.getParticipantContact(i).thumbnail;
         else
-            abbr = thread.getParticipantContact(i).getAbbreviation();
+            thumbnailText = thread.getParticipantContact(i).getAbbreviation();
 
         name += thread.getParticipantContact(i).getDisplayName() + ", ";
     }
@@ -41,7 +44,8 @@ function prependThread(thread) {
         templateThread(
             {
                 id: thread.id,
-                thumbnail: abbr,
+                thumbnailImage: thumbnailImage,
+                thumbnailText: thumbnailText,
                 color: thread.getParticipantContact(0).color,
                 name: name,
                 preview: thread.getMostRecentMessage().body
@@ -60,10 +64,14 @@ function prependThread(thread) {
 function appendMessage(message) {
     let color = message.getSenderContact() == null ? colorSent : message.getSenderContact().color;
     let sender;
-    let thumbnail;
+    let thumbnailImage;
+    let thumbnailText;
     if (message.thread.participants.length > 1 && message.sender != null) {
         sender = message.getSenderContact().getDisplayName();
-        thumbnail = message.getSenderContact().getAbbreviation();
+        if (message.getSenderContact().thumbnail !== undefined)
+            thumbnailImage = message.getSenderContact().thumbnail;
+        else
+            thumbnailText = message.getSenderContact().getAbbreviation();
     }
 
     // Add message attachments
@@ -79,7 +87,8 @@ function appendMessage(message) {
                             mime: message.attachments[i].mime,
                             image: message.attachments[i].data,
                             sender: sender,
-                            thumbnail: thumbnail,
+                            thumbnailImage: thumbnailImage,
+                            thumbnailText: thumbnailText,
                             pending: message.pending
                         }
                     )
@@ -101,7 +110,8 @@ function appendMessage(message) {
                     sent: message.sender == null,
                     message: message.body,
                     sender: sender,
-                    thumbnail: thumbnail,
+                    thumbnailImage: thumbnailImage,
+                    thumbnailText: thumbnailText,
                     pending: message.pending
                 }
             )
