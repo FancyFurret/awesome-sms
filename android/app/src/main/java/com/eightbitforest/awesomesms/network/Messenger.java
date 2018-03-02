@@ -17,6 +17,8 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.eightbitforest.awesomesms.AwesomeSMS.SERVER_IP;
+
 /**
  * Communicates with the server.
  *
@@ -24,8 +26,6 @@ import org.json.JSONObject;
  */
 public class Messenger implements ITextListener, IContactListener {
 
-    private static final String IP = "http://192.168.1.79:11150"; // TODO: Move to settings
-    //    private static final String IP = "http://192.168.42.205:11150"; // TODO: Move to settings
     private static final String INSERT_MESSAGE = "/insert_message";
     private static final String UPDATE_CONTACT = "/update_contact";
     private static final String DELETE_CONTACT = "/delete_contact";
@@ -45,7 +45,7 @@ public class Messenger implements ITextListener, IContactListener {
         // FIXME: Object -> Json -> String -> Json is ridiculous and extremely slow.
         try {
             //Log.i(AwesomeSMS.TAG, "Sending: " + new JSONObject(gson.toJson(text)).toString());
-            JsonObjectRequest request = new JsonObjectRequest(IP + INSERT_MESSAGE, new JSONObject(gson.toJson(text)),
+            JsonObjectRequest request = new JsonObjectRequest(SERVER_IP + INSERT_MESSAGE, new JSONObject(gson.toJson(text)),
                     response -> Log.i(AwesomeSMS.TAG, "Successfully sent message to server! " + response),
                     error -> Log.e(AwesomeSMS.TAG, "Unable to send message to server!" + error)) {
             };
@@ -62,7 +62,7 @@ public class Messenger implements ITextListener, IContactListener {
     public void ContactUpdated(Contact contact) {
         try {
             Log.i(AwesomeSMS.TAG, "Sending: " + new JSONObject(gson.toJson(contact)).toString());
-            JsonObjectRequest request = new JsonObjectRequest(IP + UPDATE_CONTACT, new JSONObject(gson.toJson(contact)),
+            JsonObjectRequest request = new JsonObjectRequest(SERVER_IP + UPDATE_CONTACT, new JSONObject(gson.toJson(contact)),
                     response -> Log.i(AwesomeSMS.TAG, "Successfully sent message to server! " + response),
                     error -> Log.e(AwesomeSMS.TAG, "Unable to send message to server!" + error)) {
             };
@@ -81,7 +81,7 @@ public class Messenger implements ITextListener, IContactListener {
             JSONObject removedContact = new JSONObject();
             removedContact.put("id", id);
             Log.i(AwesomeSMS.TAG, "Sending: " + removedContact.toString());
-            JsonObjectRequest request = new JsonObjectRequest(IP + DELETE_CONTACT, removedContact,
+            JsonObjectRequest request = new JsonObjectRequest(SERVER_IP + DELETE_CONTACT, removedContact,
                     response -> Log.i(AwesomeSMS.TAG, "Successfully sent message to server! " + response),
                     error -> Log.e(AwesomeSMS.TAG, "Unable to send message to server!" + error)) {
             };

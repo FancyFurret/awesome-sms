@@ -150,6 +150,19 @@ public class TextMessage {
             this.data = Base64.encodeToString(data, Base64.DEFAULT);
         }
 
+        /**
+         * Constructs an Attachment.
+         *
+         * @param id   The id of the attachment.
+         * @param mime The mime type of the attachment.
+         * @param data The base64 data of the attachment.
+         */
+        public Attachment(int id, String mime, String data) {
+            this.id = id;
+            this.mime = mime;
+            this.data = data;
+        }
+
         public int getId() {
             return id;
         }
