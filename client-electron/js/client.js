@@ -53,6 +53,8 @@ $(document).ready(function () {
                 };
                 reader.readAsDataURL(input.files[i]);
             }
+
+            $("#entry-bar-attachment-input").val("");
         });
 
         // Text
