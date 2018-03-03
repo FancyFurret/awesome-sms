@@ -13,7 +13,6 @@
     <script src="node_modules/material-colors/dist/colors.js"></script>
     <script src="node_modules/handlebars/dist/handlebars.js"></script>
     <script src="node_modules/jquery/dist/jquery.js"></script>
-    <script src="node_modules/jquery.dotdotdot/dist/jquery.dotdotdot.js"></script>
 
     <script src="js/api/awesome-sms-api.js"></script>
 
@@ -36,8 +35,8 @@
         <div class="thread" id="thread-{{id}}">
             {{> template-thumbnail type="thread"}}
             <div class="thread-information">
-                <p class="thread-contact-name">{{name}}</p>
-                <p class="thread-preview-text ellipsis">{{preview}}</p>
+                <p class="thread-contact-name overflow">{{name}}</p>
+                <p class="thread-preview-text overflow">{{preview}}</p>
             </div>
         </div>
     </script>

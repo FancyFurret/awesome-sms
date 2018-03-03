@@ -57,6 +57,12 @@ html, body{
     height:100%;
 }
 
+.overflow {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 #threads-container {
     float: left;
     width: 35%;
@@ -66,10 +72,6 @@ html, body{
 #threads {
     height: 100%;
     overflow-y: scroll;
-}
-
-#threads li {
-    list-style: none;
 }
 
 .thread {
@@ -85,7 +87,6 @@ html, body{
 
 .thumbnail {
     border-radius: 100%;
-    float: left;
 }
 
 .thumbnail-image {
@@ -115,7 +116,6 @@ html, body{
 }
 
 .thread-information {
-    float: left;
     padding-left: 10px;
 
     display: flex;
@@ -123,6 +123,8 @@ html, body{
     justify-content: center;
 
     height: var(--thread-height);
+
+    min-width: 0; /* Needed so that text doesn't overflow */
 }
 
 .thread-contact-name {
