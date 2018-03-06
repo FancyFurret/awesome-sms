@@ -51,7 +51,7 @@ function prependThread(thread) {
                 preview: thread.getMostRecentMessage().body
             }
         ));
-    $("#threads").prepend(uiThread);
+    $("#thread-list").prepend(uiThread);
     return uiThread;
 }
 

@@ -153,6 +153,46 @@ html, body{
     width: 100%;
 }
 
+.conversation-header {
+    background-color: #2a2a2a;
+    color: var(--foreground-color);
+}
+
+.conversation-header:hover {
+    background-color: #2a2a2a;
+    cursor: auto;
+}
+
+.conversation-header .thread-thumbnail {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    background-color: red;
+}
+
+.conversation-header .thread-contact-name {
+    font-size: 1.1em;
+}
+
+.to-bar {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #2a2a2a;
+    padding: 5px;
+}
+
+.to-bar-item {
+    /*TODO: USE CONTACT COLOR*/
+    background-color: #999;
+    border-radius: 12px;
+    margin: 5px;
+}
+
+.to-bar-item p {
+    padding: 3px 5px;
+}
+
 #messages-container {
     display: flex;
     flex-direction: column-reverse;

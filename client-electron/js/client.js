@@ -91,7 +91,7 @@ $(document).ready(function () {
 });
 
 function refreshThreads() {
-    $("#threads").empty();
+    $("#thread-list").empty();
     awesomeSms.getThreadsByDate().forEach((thread) => {
         let uiThread = prependThread(thread);
         if (uiThread)
