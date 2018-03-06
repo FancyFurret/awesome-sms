@@ -102,7 +102,7 @@ function refreshThreads() {
     });
 
     if (selectedThread === undefined) {
-        selectedThread = $(".thread")[1];
+        selectedThread = $($(".thread")[1]);
     }
 
     refreshThreadMessages();
