@@ -36,7 +36,9 @@
             {{> template-thumbnail type="thread"}}
             <div class="thread-information">
                 <p class="thread-contact-name overflow">{{name}}</p>
+                {{#if preview}}
                 <p class="thread-preview-text overflow">{{preview}}</p>
+                {{/if}}
             </div>
         </div>
     </script>
@@ -98,13 +100,7 @@
 
 <div id="conversation-container">
     <div id="conversation">
-        <div class="thread conversation-header">
-            <div class="thumbnail thread-thumbnail">
-                <p class="thumbnail-text thread-thumbnail-text">3</p>
-            </div>
-            <div class="thread-information">
-                <p class="thread-contact-name overflow">(702) 370-1093, Forrest Jones, David Jones</p>
-            </div>
+        <div class="thread" id="conversation-header">
         </div>
         <!--<div class="to-bar">-->
             <!--<div class="to-bar-item">-->

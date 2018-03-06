@@ -153,25 +153,28 @@ html, body{
     width: 100%;
 }
 
-.conversation-header {
+#conversation-header {
     background-color: #2a2a2a;
     color: var(--foreground-color);
+
+    height: 65px;
+    min-height: 65px;
+    max-height: 65px;
 }
 
-.conversation-header:hover {
+#conversation-header:hover {
     background-color: #2a2a2a;
     cursor: auto;
 }
 
-.conversation-header .thread-thumbnail {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    min-height: 20px;
-    background-color: red;
+#conversation-header .thread-thumbnail {
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
+    min-height: 45px;
 }
 
-.conversation-header .thread-contact-name {
+#conversation-header .thread-contact-name {
     font-size: 1.1em;
 }
 

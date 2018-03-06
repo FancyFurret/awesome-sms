@@ -102,7 +102,7 @@ function refreshThreads() {
     });
 
     if (selectedThread === undefined) {
-        selectedThread = $(".thread").first();
+        selectedThread = $(".thread")[1];
     }
 
     refreshThreadMessages();
@@ -116,6 +116,8 @@ function refreshThreadMessages() {
     $("#messages").empty();
     for (let i = 0; i < awesomeSms.getThread(threadId).messages.length; i++)
         appendMessage(awesomeSms.getThread(threadId).messages[i]);
+
+    setHeader(awesomeSms.getThread(threadId));
 }
 
 function getThreadIdFromThread(thread) {

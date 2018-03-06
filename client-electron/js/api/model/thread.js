@@ -27,4 +27,27 @@ class Thread {
     getParticipantContact(i) {
         return awesomeSms._contacts.get(this.participants[i]);
     }
+
+    getAbbreviation() {
+        if (this.participants.length > 1)
+            return this.participants.length;
+
+        return this.getParticipantContact(0).getAbbreviation();
+    }
+
+    getThumbnail() {
+        if (this.participants.length > 1)
+            return undefined;
+
+        return this.getParticipantContact(0).thumbnail;
+    }
+
+    getNames() {
+        let name = "";
+        for (let i = 0; i < this.participants.length; i++) {
+            name += this.getParticipantContact(i).getDisplayName() + ", ";
+        }
+        name = name.slice(0, -2);
+        return name;
+    }
 }

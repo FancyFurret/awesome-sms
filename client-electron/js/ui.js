@@ -24,21 +24,29 @@ function initUi() {
     templateEntryBarImage = Handlebars.compile(templateEntryBarImageSource);
 }
 
-function prependThread(thread) {
-    let thumbnailText = thread.participants.length > 1 ? "#" : thread.getParticipantContact(0).getAbbreviation();
-    let thumbnailImage;
-    let name = "";
-    for (let i = 0; i < thread.participants.length; i++) {
-        if (i > 0) // More than 1 participant
-            thumbnailText = i + 1;
-        else if (thread.getParticipantContact(i).thumbnail !== undefined)
-            thumbnailImage = thread.getParticipantContact(i).thumbnail;
-        else
-            thumbnailText = thread.getParticipantContact(i).getAbbreviation();
+function setHeader(thread) {
+    let thumbnailText = thread.getAbbreviation();
+    let thumbnailImage = thread.getThumbnail();
+    let name = thread.getNames();
 
-        name += thread.getParticipantContact(i).getDisplayName() + ", ";
-    }
-    name = name.slice(0, -2);
+    let uiThread = $(
+        templateThread(
+            {
+                id: "header-" + thread.id,
+                thumbnailImage: thumbnailImage,
+                thumbnailText: thumbnailText,
+                color: thread.getParticipantContact(0).color,
+                name: name
+            }
+        ));
+    $("#conversation-header").html(uiThread);
+    return uiThread;
+}
+
+function prependThread(thread) {
+    let thumbnailText = thread.getAbbreviation();
+    let thumbnailImage = thread.getThumbnail();
+    let name = thread.getNames();
 
     let uiThread = $(
         templateThread(
